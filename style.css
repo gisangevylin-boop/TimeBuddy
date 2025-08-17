@@ -49,25 +49,42 @@ body {
     margin-right: 15px;
 }
 
-/* Logo styling */
-.logo-container {
-    display: flex;
-    align-items: center;
+/* Logo styling to match your screenshot */
+.logo {
     padding: 20px;
     border-bottom: 1px solid #e0e0e0;
+    text-align: center;
+    margin-bottom: 10px;
 }
 
-.logo-img {
-    width: 30px;
-    height: 30px;
+.logo-main {
+    font-size: 28px;
+    font-weight: 700;
+    color: #4a6bff; /* Primary blue from your interface */
+    letter-spacing: 1px;
+}
+
+.logo-sub {
+    font-size: 12px;
+    color: #777;
+    margin-top: -5px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+}
+
+.section-header {
+    display: flex;
+    align-items: baseline;
+    margin-bottom: 20px;
+}
+
+.section-logo {
+    font-size: 24px;
+    font-weight: bold;
+    color: #4a6bff;
     margin-right: 10px;
 }
 
-.logo-text {
-    font-size: 24px;
-    font-weight: bold;
-    color: #4a6bff; /* Match your theme color */
-}
 .sidebar nav ul {
     list-style: none;
     padding: 20px 0;
@@ -703,3 +720,4 @@ th {
         width: 100%;
     }
 }
+

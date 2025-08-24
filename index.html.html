@@ -1,0 +1,470 @@
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Time Buddy</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f5f5f5;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        .container {
+            display: flex;
+            height: 100vh;
+        }
+
+        /* Sidebar Styles */
+        .sidebar {
+            width: 200px;
+            background: white;
+            color: #333;
+            padding: 20px 0;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 2px 0 10px rgba(0, 0, 0, 0.10);
+        }
+
+        .logo-section {
+            padding: 0 20px;
+            margin-bottom: 40px;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            font-size: 24px;
+            font-weight: bold;
+        }
+
+        .logo i {
+            margin-right: 10px;
+            color: #4a90e2;
+        }
+
+        .nav-menu {
+            flex: 1;
+            padding: 0 10px;
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            padding: 12px 15px;
+            margin-bottom: 5px;
+            cursor: pointer;
+            border-radius: 8px;
+            transition: background-color 0.3s ease;
+            font-size: 14px;
+        }
+
+        .nav-item:hover {
+            background-color: rgba(123, 185, 232, 0.1);
+        }
+
+        .nav-item.active {
+            background-color: rgba(123, 185, 232, 0.15);
+        }
+
+        .nav-item i {
+            margin-right: 12px;
+            width: 16px;
+            text-align: center;
+        }
+
+        .bottom-nav {
+            padding: 0 10px;
+            border-top: 1px solid rgba(123, 185, 232, 0.2);
+            margin-top: 20px;
+            padding-top: 20px;
+        }
+
+        /* Main Content Styles */
+        .main-content {
+            flex: 1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: linear-gradient(135deg, #f0f8ff 0%, #e6f3ff 100%);
+        }
+
+        .login-container {
+            width: 100%;
+            max-width: 400px;
+            padding: 20px;
+        }
+
+        .login-box {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+
+        .login-header {
+            background: white;
+            padding: 30px;
+            text-align: center;
+            border-bottom: 2px solid #f0f8ff;
+        }
+
+        .login-logo {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 28px;
+            font-weight: bold;
+            color: #333;
+        }
+
+        .login-logo i {
+            margin-right: 10px;
+            color: #4a90e2;
+        }
+
+        .logo-text {
+            color: #333;
+        }
+
+        .logo-buddy {
+            color: #4a90e2;
+            margin-left: 5px;
+        }
+
+        .login-form {
+            padding: 40px 30px;
+        }
+
+        .input-group {
+            margin-bottom: 20px;
+        }
+
+        .input-field {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: border-color 0.3s ease;
+            outline: none;
+        }
+
+        .input-field:focus {
+            border-color: #7cb9e8;
+        }
+
+        .login-btn {
+            width: 100%;
+            background: #5ba3d4;
+            color: white;
+            border: none;
+            padding: 15px;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.3s ease;
+            margin-bottom: 15px;
+        }
+
+        .login-btn:hover {
+            transform: translateY(-2px);
+        }
+
+        .forgot-password {
+            text-align: center;
+            margin: 20px 0;
+        }
+
+        .forgot-password a {
+            color: #7cb9e8;
+            text-decoration: none;
+            font-size: 14px;
+        }
+
+        .forgot-password a:hover {
+            text-decoration: underline;
+        }
+
+        .signup-btn {
+            width: 100%;
+            background: #5ba3d4;
+            color: white;
+            border: none;
+            padding: 15px;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            margin-bottom: 25px;
+        }
+
+        .signup-btn:hover {
+            background: #4a90e2;
+        }
+
+        .social-login {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+        }
+
+        .google-btn,
+        .facebook-btn {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            border: none;
+            cursor: pointer;
+            font-size: 18px;
+            transition: transform 0.3s ease;
+        }
+
+        .google-btn {
+            background: #db4437;
+            color: white;
+        }
+
+        .facebook-btn {
+            background: #3b5998;
+            color: white;
+        }
+
+        .google-btn:hover,
+        .facebook-btn:hover {
+            transform: scale(1.1);
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .sidebar {
+                width: 60px;
+            }
+            
+            .sidebar .nav-item span {
+                display: none;
+            }
+            
+            .logo span {
+                display: none;
+            }
+            
+            .login-container {
+                max-width: 350px;
+            }
+            
+            .login-form {
+                padding: 30px 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Left Sidebar -->
+        <div class="sidebar">
+            <div class="logo-section">
+                <div class="logo">
+                    <i class="fas fa-clock"></i>
+                    <span>Time Buddy</span>
+                </div>
+            </div>
+            
+            <nav class="nav-menu">
+                <div class="nav-item active">
+                    <i class="fas fa-home"></i>
+                    <span>Dashboard</span>
+                </div>
+                <div class="nav-item">
+                    <i class="fas fa-calendar-alt"></i>
+                    <span>Timetable</span>
+                </div>
+                <div class="nav-item">
+                    <i class="fas fa-users"></i>
+                    <span>Groups</span>
+                </div>
+                <div class="nav-item">
+                    <i class="fas fa-chalkboard-teacher"></i>
+                    <span>Lecturer Consult</span>
+                </div>
+                <div class="nav-item">
+                    <i class="fas fa-bell"></i>
+                    <span>Notifications</span>
+                </div>
+            </nav>
+            
+            <div class="bottom-nav">
+                <div class="nav-item">
+                    <i class="fas fa-sign-in-alt"></i>
+                    <span>Login/SignUp</span>
+                </div>
+                <div class="nav-item">
+                    <i class="fas fa-cog"></i>
+                    <span>Settings</span>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Main Content -->
+        <div class="main-content">
+            <div class="login-container">
+                <div class="login-box">
+                    <div class="login-header">
+                        <div class="login-logo">
+                            <i class="fas fa-clock"></i>
+                            <span class="logo-text">Time</span>
+                            <span class="logo-buddy">Buddy</span>
+                        </div>
+                    </div>
+                    
+                    <form class="login-form">
+                        <div class="input-group">
+                            <input type="text" placeholder="Email/Username" class="input-field">
+                        </div>
+                        <div class="input-group">
+                            <input type="password" placeholder="Password" class="input-field">
+                        </div>
+                        
+                        <button type="submit" class="login-btn">Login</button>
+                        
+                        <div class="forgot-password">
+                            <a href="#">Forgot Password?</a>
+                        </div>
+                        
+                        <button type="button" class="signup-btn">Sign Up</button>
+                        
+                        <div class="social-login">
+                            <button type="button" class="google-btn">
+                                <i class="fab fa-google"></i>
+                            </button>
+                            <button type="button" class="facebook-btn">
+                                <i class="fab fa-facebook-f"></i>
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+ <script>
+        // Firebase configuration - Replace with your actual config
+       // For Firebase JS SDK v7.20.0 and later, measurementId is optional
+        // For Firebase JS SDK v7.20.0 and later, measurementId is optional
+const firebaseConfig = {
+  apiKey: "AIzaSyC5N0pzxGjxNUnFxJlZbkpXvPSkqg5jGdw",
+  authDomain: "timebuddy-d54a3.firebaseapp.com",
+  projectId: "timebuddy-d54a3",
+  storageBucket: "timebuddy-d54a3.firebasestorage.app",
+  messagingSenderId: "235396426991",
+  appId: "1:235396426991:web:c97868da076cd0f58abf1a",
+  measurementId: "G-KF4YRMJ6YE"
+};
+
+// Initialize Firebase
+firebase.initializeApp(firebaseConfig);
+
+// Initialize services
+const auth = firebase.auth();
+const db = firebase.firestore();
+
+// Export the services
+export { auth, db };
+
+        document.addEventListener('DOMContentLoaded', function() {
+            const loginForm = document.getElementById('loginForm');
+            const signupButton = document.getElementById('signupButton');
+            const forgotPassword = document.getElementById('forgotPassword');
+            const googleLogin = document.getElementById('googleLogin');
+            const facebookLogin = document.getElementById('facebookLogin');
+
+            // Login with email and password
+            loginForm.addEventListener('submit', function(e) {
+                e.preventDefault();
+                
+                const email = document.getElementById('email').value;
+                const password = document.getElementById('password').value;
+                
+                auth.signInWithEmailAndPassword(email, password)
+                    .then((userCredential) => {
+                        // Signed in 
+                        window.location.href = 'Dashboard Page.html';
+                    })
+                    .catch((error) => {
+                        alert('Login error: ' + error.message);
+                    });
+            });
+
+            // Sign up new users
+            signupButton.addEventListener('click', function() {
+                const email = document.getElementById('email').value;
+                const password = document.getElementById('password').value;
+                
+                auth.createUserWithEmailAndPassword(email, password)
+                    .then((userCredential) => {
+                        // Signed up
+                        window.location.href = 'Dashboard Page.html';
+                    })
+                    .catch((error) => {
+                        alert('Signup error: ' + error.message);
+                    });
+            });
+
+            // Password reset
+            forgotPassword.addEventListener('click', function(e) {
+                e.preventDefault();
+                
+                const email = document.getElementById('email').value;
+                if (!email) {
+                    alert('Please enter your email address first');
+                    return;
+                }
+                
+                auth.sendPasswordResetEmail(email)
+                    .then(() => {
+                        alert('Password reset email sent!');
+                    })
+                    .catch((error) => {
+                        alert('Error sending password reset: ' + error.message);
+                    });
+            });
+
+            // Google authentication
+            googleLogin.addEventListener('click', function() {
+                const provider = new firebase.auth.GoogleAuthProvider();
+                
+                auth.signInWithPopup(provider)
+                    .then((result) => {
+                        window.location.href = 'Dashboard Page.html';
+                    }).catch((error) => {
+                        alert('Google login error: ' + error.message);
+                    });
+            });
+
+            // Facebook authentication
+            facebookLogin.addEventListener('click', function() {
+                const provider = new firebase.auth.FacebookAuthProvider();
+                
+                auth.signInWithPopup(provider)
+                    .then((result) => {
+                        window.location.href = 'Dashboard Page.html';
+                    }).catch((error) => {
+                        alert('Facebook login error: ' + error.message);
+                    });
+            });
+        });
+    </script>
+</body>
+</html>

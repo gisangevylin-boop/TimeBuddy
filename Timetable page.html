@@ -1,0 +1,648 @@
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Time Buddy - Timetable</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f5f5f5;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        .container {
+            display: flex;
+            height: 100vh;
+        }
+
+        /* Sidebar Styles */
+        .sidebar {
+            width: 200px;
+            background: white;
+            color: #333;
+            padding: 20px 0;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .logo-section {
+            padding: 0 20px;
+            margin-bottom: 40px;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            font-size: 24px;
+            font-weight: bold;
+        }
+
+        .logo i {
+            margin-right: 10px;
+            color: #4a90e2;
+        }
+
+        .nav-menu {
+            flex: 1;
+            padding: 0 10px;
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            padding: 12px 15px;
+            margin-bottom: 5px;
+            cursor: pointer;
+            border-radius: 8px;
+            transition: background-color 0.3s ease;
+            font-size: 14px;
+            text-decoration: none;
+            color: #333;
+        }
+
+        .nav-item:hover {
+            background-color: rgba(123, 185, 232, 0.1);
+        }
+
+        .nav-item.active {
+            background-color: rgba(123, 185, 232, 0.15);
+        }
+
+        .nav-item i {
+            margin-right: 12px;
+            width: 16px;
+            text-align: center;
+        }
+
+        .bottom-nav {
+            padding: 0 10px;
+            border-top: 1px solid rgba(123, 185, 232, 0.2);
+            margin-top: 20px;
+            padding-top: 20px;
+        }
+
+        /* Main Content Styles */
+        .main-content {
+            flex: 1;
+            background: linear-gradient(135deg, #f0f8ff 0%, #e6f3ff 100%);
+            padding: 20px;
+            overflow-y: auto;
+        }
+
+        .timetable-container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        /* Page Header */
+        .page-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            background: white;
+            padding: 20px 30px;
+            border-radius: 12px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .page-header h1 {
+            color: #333;
+            font-size: 28px;
+            margin: 0;
+        }
+
+        .search-box {
+            position: relative;
+        }
+
+        .search-input {
+            padding: 12px 40px 12px 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            width: 300px;
+            font-size: 14px;
+            outline: none;
+            transition: border-color 0.3s ease;
+        }
+
+        .search-input:focus {
+            border-color: #7cb9e8;
+        }
+
+        .search-icon {
+            position: absolute;
+            right: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #999;
+        }
+
+        /* Timetable Styles */
+        .timetable-controls {
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+        }
+
+        .file-upload {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .file-input {
+            padding: 10px 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            background: #f9f9f9;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            cursor: pointer;
+        }
+
+        .file-status {
+            color: #999;
+            font-size: 14px;
+        }
+
+        .generate-btn {
+            background: #7cb9e8;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+        }
+
+        .time-blocks {
+            margin-bottom: 20px;
+        }
+
+        .time-block {
+            display: inline-block;
+            margin: 5px;
+            padding: 5px 10px;
+            background: #e8f4fd;
+            border-radius: 5px;
+            font-size: 12px;
+            color: #4a90e2;
+        }
+
+        .timetable-grid {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+
+        .time-header {
+            display: grid;
+            grid-template-columns: 100px repeat(4, 1fr);
+            background: #f8f9fa;
+            padding: 15px;
+            font-weight: 600;
+            color: #333;
+        }
+
+        .day-row {
+            display: grid;
+            grid-template-columns: 100px repeat(4, 1fr);
+            border-bottom: 1px solid #eee;
+            min-height: 60px;
+        }
+
+        .day-row:last-child {
+            border-bottom: none;
+        }
+
+        .day-label {
+            padding: 15px;
+            background: #f8f9fa;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            border-right: 1px solid #eee;
+        }
+
+        .time-slot {
+            padding: 10px;
+            border-right: 1px solid #eee;
+            display: flex;
+            align-items: center;
+            min-height: 60px;
+        }
+
+        .time-slot:last-child {
+            border-right: none;
+        }
+
+        .class-block {
+            background: #7cb9e8;
+            color: white;
+            padding: 8px;
+            border-radius: 5px;
+            font-size: 12px;
+            width: 100%;
+            text-align: center;
+        }
+
+        .class-block.web-dev {
+            background: #5ba3d4;
+        }
+
+        .class-block.multimedia {
+            background: #9b59b6;
+        }
+
+        .class-block.data-structure {
+            background: #e74c3c;
+        }
+
+        .class-block.mhu {
+            background: #f39c12;
+        }
+
+        .add-classes-btn {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: #7cb9e8;
+            color: white;
+            border: none;
+            padding: 15px 25px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-weight: 600;
+            box-shadow: 0 4px 15px rgba(123, 185, 232, 0.4);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .add-classes-btn:hover {
+            background: #5ba3d4;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .sidebar {
+                width: 60px;
+            }
+            
+            .sidebar .nav-item span {
+                display: none;
+            }
+            
+            .logo span {
+                display: none;
+            }
+            
+            .page-header {
+                flex-direction: column;
+                gap: 15px;
+            }
+            
+            .search-input {
+                width: 100%;
+            }
+
+            .time-header,
+            .day-row {
+                grid-template-columns: 80px repeat(4, 1fr);
+            }
+
+            .file-upload {
+                flex-direction: column;
+                align-items: stretch;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Left Sidebar -->
+        <div class="sidebar">
+            <div class="logo-section">
+                <div class="logo">
+                    <i class="fas fa-clock"></i>
+                    <span>Time Buddy</span>
+                </div>
+            </div>
+            
+            <nav class="nav-menu">
+                <a href="Dashboard Page.html" class="nav-item">
+                    <i class="fas fa-home"></i>
+                    <span>Dashboard</span>
+                </a>
+                <a href="Timetable page.html" class="nav-item active">
+                    <i class="fas fa-calendar-alt"></i>
+                    <span>Timetable</span>
+                </a>
+                <a href="Group page.html" class="nav-item">
+                    <i class="fas fa-users"></i>
+                    <span>Groups</span>
+                </a>
+                <a href="Lecturer consultation page.html" class="nav-item">
+                    <i class="fas fa-chalkboard-teacher"></i>
+                    <span>Lecturer Consult</span>
+                </a>
+                <a href="Notification page.html" class="nav-item">
+                    <i class="fas fa-bell"></i>
+                    <span>Notifications</span>
+                </a>
+            </nav>
+            
+            <div class="bottom-nav">
+                <div class="nav-item">
+                    <i class="fas fa-sign-in-alt"></i>
+                    <span>Login/SignUp</span>
+                </div>
+                <div class="nav-item">
+                    <i class="fas fa-cog"></i>
+                    <span>Settings</span>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Main Content -->
+        <div class="main-content">
+            <div class="timetable-container">
+                <div class="page-header">
+                    <h1>My Timetable</h1>
+                    <div class="search-box">
+                        <input type="text" placeholder="Search" class="search-input">
+                        <i class="fas fa-search search-icon"></i>
+                    </div>
+                </div>
+
+                <div class="timetable-controls">
+                    <div class="file-upload">
+                        <div class="file-input">
+                            <i class="fas fa-file-upload"></i>
+                            <span>Upload schedule</span>
+                            <span class="file-status">Choose Files</span>
+                            <span class="file-status">1 Files Selected</span>
+                        </div>
+                        <button class="generate-btn">Generate</button>
+                    </div>
+
+                    <div class="time-blocks">
+                        <strong>Available Time Blocks (Suggested)</strong><br>
+                        <div style="margin-top: 10px;">
+                            <span class="time-block">Tue 2-4 PM</span>
+                            <span class="time-block">Wed 9-11 AM</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="timetable-grid">
+                    <div class="time-header">
+                        <div></div>
+                        <div>8:00 - 10:00</div>
+                        <div>10:00-11:00</div>
+                        <div>11:00-12:00</div>
+                        <div></div>
+                    </div>
+
+                    <div class="day-row">
+                        <div class="day-label">Monday</div>
+                        <div class="time-slot">
+                            <div class="class-block web-dev">Web Development<br>PSL2</div>
+                        </div>
+                        <div class="time-slot"></div>
+                        <div class="time-slot"></div>
+                        <div class="time-slot"></div>
+                    </div>
+
+                    <div class="day-row">
+                        <div class="day-label">Tuesday</div>
+                        <div class="time-slot"></div>
+                        <div class="time-slot"></div>
+                        <div class="time-slot"></div>
+                        <div class="time-slot">
+                            <div class="class-block multimedia">Multimedia<br>PSL1</div>
+                        </div>
+                    </div>
+
+                    <div class="day-row">
+                        <div class="day-label">Wednesday</div>
+                        <div class="time-slot"></div>
+                        <div class="time-slot">
+                            <div class="class-block mhu">MHU</div>
+                        </div>
+                        <div class="time-slot"></div>
+                        <div class="time-slot"></div>
+                    </div>
+
+                    <div class="day-row">
+                        <div class="day-label">Thursday</div>
+                        <div class="time-slot"></div>
+                        <div class="time-slot"></div>
+                        <div class="time-slot"></div>
+                        <div class="time-slot">
+                            <div class="class-block data-structure">Data Structure<br>HYP</div>
+                        </div>
+                    </div>
+
+                    <div class="day-row">
+                        <div class="day-label">Friday</div>
+                        <div class="time-slot"></div>
+                        <div class="time-slot"></div>
+                        <div class="time-slot"></div>
+                        <div class="time-slot"></div>
+                    </div>
+                </div>
+
+                <button class="add-classes-btn">
+                    <i class="fas fa-plus"></i> Add Classes
+                </button>
+            </div>
+        </div>
+    </div>
+
+     <script>
+        // Firebase configuration - Replace with your actual config
+        // For Firebase JS SDK v7.20.0 and later, measurementId is optional
+const firebaseConfig = {
+  apiKey: "AIzaSyC5N0pzxGjxNUnFxJlZbkpXvPSkqg5jGdw",
+  authDomain: "timebuddy-d54a3.firebaseapp.com",
+  projectId: "timebuddy-d54a3",
+  storageBucket: "timebuddy-d54a3.firebasestorage.app",
+  messagingSenderId: "235396426991",
+  appId: "1:235396426991:web:c97868da076cd0f58abf1a",
+  measurementId: "G-KF4YRMJ6YE"
+};
+        // Initialize Firebase
+        firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+        const db = firebase.firestore();
+
+        document.addEventListener('DOMContentLoaded', function() {
+            const authButton = document.getElementById('authButton');
+            const fileUpload = document.getElementById('fileUpload');
+            const generateBtn = document.getElementById('generateTimetable');
+            const addClassesBtn = document.getElementById('addClassesBtn');
+            const searchInput = document.getElementById('searchInput');
+            
+            // Check authentication state
+            auth.onAuthStateChanged(user => {
+                if (user) {
+                    authButton.innerHTML = '<i class="fas fa-sign-out-alt"></i><span>Logout</span>';
+                    authButton.onclick = () => auth.signOut();
+                    loadTimetable(user.uid);
+                } else {
+                    authButton.innerHTML = '<i class="fas fa-sign-in-alt"></i><span>Login/SignUp</span>';
+                    authButton.onclick = () => window.location.href = 'Login Page.html';
+                }
+            });
+
+            // File upload handler
+            fileUpload.addEventListener('click', function() {
+                const input = document.createElement('input');
+                input.type = 'file';
+                input.accept = '.csv,.json,.txt';
+                
+                input.onchange = e => {
+                    const file = e.target.files[0];
+                    if (file) {
+                        document.getElementById('fileStatus').textContent = file.name;
+                        // Here you would process the file and extract timetable data
+                    }
+                };
+                
+                input.click();
+            });
+
+            // Generate timetable
+            generateBtn.addEventListener('click', function() {
+                // This would process the uploaded file and generate the timetable
+                alert('Timetable generation would happen here');
+            });
+
+            // Add classes button
+            addClassesBtn.addEventListener('click', function() {
+                // Open a modal or form to add classes manually
+                alert('Add classes form would open here');
+            });
+
+            // Search functionality
+            let searchTimeout;
+            searchInput.addEventListener('input', function(e) {
+                clearTimeout(searchTimeout);
+                searchTimeout = setTimeout(() => {
+                    filterTimetable(e.target.value);
+                }, 300);
+            });
+
+            // Load timetable from Firestore
+            function loadTimetable(userId) {
+                db.collection('timetables')
+                    .where('userId', '==', userId)
+                    .orderBy('createdAt', 'desc')
+                    .limit(1)
+                    .get()
+                    .then(snapshot => {
+                        if (!snapshot.empty) {
+                            const timetable = snapshot.docs[0].data();
+                            renderTimetable(timetable);
+                        } else {
+                            // Load default empty timetable
+                            renderTimetable(getEmptyTimetable());
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error loading timetable:', error);
+                        renderTimetable(getEmptyTimetable());
+                    });
+            }
+
+            // Render timetable to the grid
+            function renderTimetable(timetable) {
+                const grid = document.getElementById('timetableGrid');
+                grid.innerHTML = '';
+                
+                // Create time header
+                const timeHeader = document.createElement('div');
+                timeHeader.className = 'time-header';
+                timeHeader.innerHTML = `
+                    <div></div>
+                    <div>8:00 - 10:00</div>
+                    <div>10:00-11:00</div>
+                    <div>11:00-12:00</div>
+                    <div></div>
+                `;
+                grid.appendChild(timeHeader);
+                
+                // Create day rows
+                const days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'];
+                days.forEach(day => {
+                    const dayRow = document.createElement('div');
+                    dayRow.className = 'day-row';
+                    
+                    const dayLabel = document.createElement('div');
+                    dayLabel.className = 'day-label';
+                    dayLabel.textContent = day;
+                    dayRow.appendChild(dayLabel);
+                    
+                    // Add time slots
+                    for (let i = 0; i < 4; i++) {
+                        const timeSlot = document.createElement('div');
+                        timeSlot.className = 'time-slot';
+                        
+                        // Check if there's a class at this time
+                        const classInfo = timetable[day] && timetable[day][i];
+                        if (classInfo) {
+                            const classBlock = document.createElement('div');
+                            classBlock.className = `class-block ${classInfo.type || ''}`;
+                            classBlock.innerHTML = `${classInfo.name}<br>${classInfo.location}`;
+                            timeSlot.appendChild(classBlock);
+                        }
+                        
+                        dayRow.appendChild(timeSlot);
+                    }
+                    
+                    grid.appendChild(dayRow);
+                });
+            }
+
+            // Create empty timetable structure
+            function getEmptyTimetable() {
+                return {
+                    Monday: {},
+                    Tuesday: {},
+                    Wednesday: {},
+                    Thursday: {},
+                    Friday: {},
+                    createdAt: new Date()
+                };
+            }
+
+            // Filter timetable based on search query
+            function filterTimetable(query) {
+                if (query.length > 2) {
+                    console.log('Filtering timetable with query:', query);
+                    // Implementation would filter the visible timetable
+                }
+            }
+        });
+    </script>
+</body>
+</html>

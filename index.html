@@ -409,7 +409,7 @@
             // In a real app, you would send this to your backend
             // For demo purposes, we'll simulate a login process
             setTimeout(() => {
-                if (email && password) {
+                if (email === 'demo@example.com' && password === 'password') {
                     showSuccess('Login successful! Redirecting...');
                     // Redirect to dashboard after a short delay
                     setTimeout(() => {
@@ -417,7 +417,7 @@
                     }, 1500);
                 } else {
                     setLoading(false);
-                    showError('Invalid email or password. Try demo@example.com / password');
+                    showError('Invalid email or password');
                 }
             }, 1000);
         }       
@@ -472,13 +472,9 @@
                 closeModal();
             }
         });
-        
-        // Demo credentials hint
-        setTimeout(() => {
-            showError('Use demo@example.com / password to login');
-        }, 2000);
     </script>
 </body>
 
 </html>
+
 

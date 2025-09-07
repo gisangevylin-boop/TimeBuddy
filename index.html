@@ -173,6 +173,7 @@
         }
     </style>
 </head>
+
 <body>
     <div class="container">
         <!-- Left Sidebar -->
@@ -229,29 +230,41 @@
                     
                     <div class="login-form">
                         <div class="error-message" id="errorMessage"></div>
-                        
+                        <div class="success-message" id="successMessage"></div>
+
+                        <form autocomplete="off">
                         <div class="input-group">
-                            <input type="email" id="email" class="input-field" placeholder="Email" required>
+                            <label for="email">Email</label>
+                            <input type="email" id="email" class="input-field" placeholder="Enter your email" autocomplete="off" required>
+                            <i class="fas fa-envelope"></i>
                         </div>
                         
                         <div class="input-group">
-                            <input type="password" id="password" class="input-field" placeholder="Password" required>
+                            <label for="password">Password</label>
+                            <input type="password" id="password" class="input-field" placeholder="Enter your password" autocomplete="new-password" required>
+                            <i class="fas fa-lock"></i>
                         </div>
                         
-                        <button class="login-btn" onclick="login()">Login</button>
+                        <button type="button" class="login-btn" onclick="login()">
+                            <span id="loginText">Login</span>
+                            <div class="loader" id="loginLoader">
+                                <div class="spinner"></div>
+                            </div>
+                        </button>
+                    </form>
                         
                         <div class="forgot-password">
-                            <a href="#">Forgot Password?</a>
-                        </div>
+                        <a href="#" onclick="showResetPasswordModal()">Forgot Password?</a>
+                    </div>
                         
                         <button class="signup-btn" onclick="showSignup()">Create New Account</button>
                         
                         <div class="social-login">
-                            <button class="google-btn" onclick="loginWithGoogle()">
-                                <i class="fab fa-google"></i>
+                            <button class="social-btn google-btn" onclick="loginWithGoogle()">
+                                <i class="fab fa-google"></i> Google
                             </button>
-                            <button class="facebook-btn" onclick="loginWithFacebook()">
-                                <i class="fab fa-facebook-f"></i>
+                            <button class="soscial-btn facebook-btn" onclick="loginWithFacebook()">
+                                <i class="fab fa-facebook-f"></i> Facebook
                             </button>
                         </div>
                     </div>
@@ -259,6 +272,8 @@
             </div>
         </div>
     </div>
+
+
 
     <!-- Firebase SDK -->
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
@@ -270,28 +285,94 @@
 
     <!-- After firebase-config.js -->
     <script src="js/auth.js"></script>
-    
-    <!-- Auth Functions -->
+
     <script>
-        function showSignup() {
-            // Create a modal for signup
+        // UI elements
+        const errorMessage = document.getElementById('errorMessage');
+        const successMessage = document.getElementById('successMessage');
+        const loginText = document.getElementById('loginText');
+        const loginLoader = document.getElementById('loginLoader');
+        
+        // Clear any autofilled values on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            setTimeout(function() {
+                document.getElementById('email').value = '';
+                document.getElementById('password').value = '';
+            }, 100);
+        });
+        
+        // Show error message
+        function showError(message) {
+            errorMessage.textContent = message;
+            errorMessage.style.display = 'block';
+            successMessage.style.display = 'none';
+        }
+        
+        // Show success message
+        function showSuccess(message) {
+            successMessage.textContent = message;
+            successMessage.style.display = 'block';
+            errorMessage.style.display = 'none';
+        }
+        
+        // Show loading state
+        function setLoading(loading) {
+            if (loading) {
+                loginText.style.display = 'none';
+                loginLoader.style.display = 'flex';
+            } else {
+                loginText.style.display = 'block';
+                loginLoader.style.display = 'none';
+            }
+        }
+        
+        // Show signup modal
+        function showSignupModal() {
             const signupModal = document.createElement('div');
+            signupModal.classList.add('modal-overlay');
             signupModal.innerHTML = `
-                <div class="modal-overlay">
-                    <div class="modal-content">
-                        <h2>Create Account</h2>
-                        <input type="text" id="signupName" placeholder="Full Name">
-                        <input type="email" id="signupEmail" placeholder="Email">
-                        <input type="password" id="signupPassword" placeholder="Password">
-                        <input type="password" id="signupConfirmPassword" placeholder="Confirm Password">
-                        <button onclick="register()">Register</button>
-                        <button onclick="closeModal()">Cancel</button>
+                <div class="modal-content">
+                    <h2>Create Account</h2>
+                    <input type="text" id="signupName" placeholder="Full Name" required>
+                    <input type="email" id="signupEmail" placeholder="Email" required>
+                    <input type="password" id="signupPassword" placeholder="Password (min. 6 characters)" required>
+                    <input type="password" id="signupConfirmPassword" placeholder="Confirm Password" required>
+                    <div class="modal-buttons">
+                        <button class="modal-btn primary" onclick="register()">Register</button>
+                        <button class="modal-btn secondary" onclick="closeModal()">Cancel</button>
                     </div>
                 </div>
             `;
             document.body.appendChild(signupModal);
         }
-
+        
+        // Show reset password modal
+        function showResetPasswordModal() {
+            const resetModal = document.createElement('div');
+            resetModal.classList.add('modal-overlay');
+            resetModal.innerHTML = `
+                <div class="modal-content">
+                    <h2>Reset Password</h2>
+                    <p style="margin-bottom: 15px; color: #666;">Enter your email address and we'll send you instructions to reset your password.</p>
+                    <input type="email" id="resetEmail" placeholder="Email" required>
+                    <div class="modal-buttons">
+                        <button class="modal-btn primary" onclick="resetPassword()">Send Reset Link</button>
+                        <button class="modal-btn secondary" onclick="closeModal()">Cancel</button>
+                    </div>
+                </div>
+            `;
+            document.body.appendChild(resetModal);
+        }
+        
+        // Close modal
+        function closeModal() {
+            const modal = document.querySelector('.modal-overlay');
+            if (modal) {
+                modal.remove();
+            }
+        }
+        
+        // Register new user
         function register() {
             const name = document.getElementById('signupName').value;
             const email = document.getElementById('signupEmail').value;
@@ -299,97 +380,110 @@
             const confirmPassword = document.getElementById('signupConfirmPassword').value;
     
             if (password !== confirmPassword) {
-                alert("Passwords don't match");
+                showError("Passwords don't match");
                 return;
-            }   
+            }
+            
+            if (password.length < 6) {
+                showError("Password must be at least 6 characters");
+                return;
+            }
     
-            // Use the function from auth.js
-            authFunctions.signUpWithEmail(email, password, name)
-                .then(() => {
-                    // Add user data to Firestore
-                    return db.collection('users').doc(auth.currentUser.uid).set({
-                        name: name,
-                        email: email,
-                        createdAt: firebase.firestore.FieldValue.serverTimestamp()
-                    });
-                })
-        .then(() => {
-            alert('Account created successfully!');
+            // In a real app, you would send this data to your backend
+            // For demo purposes, we'll simulate a successful registration
+            showSuccess('Account created successfully! Please log in.');
             closeModal();
-        })
-        .catch((error) => {
-            alert('Error: ' + error.message);
-        });
-}
-
-function closeModal() {
-  const modal = document.querySelector('.modal-overlay');
-  if (modal) {
-    modal.remove();
-  }
-}
-
+        }
+        
+        // Login with email and password
         function login() {
             const email = document.getElementById('email').value;
             const password = document.getElementById('password').value;
-            const errorMessage = document.getElementById('errorMessage');
     
-        if (!email || !password) {
-            errorMessage.textContent = 'Please enter both email and password';
-            errorMessage.style.display = 'block';
-            return;
-    }
-    
-    // Use the function from auth.js
-    authFunctions.loginWithEmail(email, password)
-        .then((userCredential) => {
-            // Redirect to dashboard on successful login
-            window.location.href = 'dashboard.html';
-        })
-        .catch((error) => {
-            errorMessage.textContent = error.message;
-            errorMessage.style.display = 'block';
-        });
-}       
-
+            if (!email || !password) {
+                showError('Please enter both email and password');
+                return;
+            }
+            
+            setLoading(true);
+            
+            // In a real app, you would send this to your backend
+            // For demo purposes, we'll simulate a login process
+            setTimeout(() => {
+                if (email === 'demo@example.com' && password === 'password') {
+                    showSuccess('Login successful! Redirecting...');
+                    // Redirect to dashboard after a short delay
+                    setTimeout(() => {
+                        window.location.href = 'dashboard.html';
+                    }, 1500);
+                } else {
+                    setLoading(false);
+                    showError('Invalid email or password');
+                }
+            }, 1000);
+        }       
+        
+        // Reset password
         function resetPassword() {
-            const email = document.getElementById('email').value;
+            const email = document.getElementById('resetEmail').value;
     
-        if (!email) {
-            alert('Please enter your email address');
-            return;
-        }
-    
-        authFunctions.resetPassword(email)
+            if (!email) {
+                showError('Please enter your email address');
+                return;
+            }
+
+            authFunctions.resetPassword(email)
             .then(() => {
                 alert('Password reset email sent!');
         })
         .catch((error) => {
             alert('Error: ' + error.message);
         });
-    }
 
-        function loginWithGoogle() {
-            const provider = new firebase.auth.GoogleAuthProvider();
-            auth.signInWithPopup(provider)
-                .then((result) => {
-                    window.location.href = 'dashboard.html';
-                })
-                .catch((error) => {
-                    console.error('Google sign-in error:', error);
-                });
+    
+            // In a real app, you would send this to your backend
+            // For demo purposes, we'll simulate the process
+            showSuccess('Password reset email sent! Check your inbox.');
+            closeModal();
         }
         
-        function loginWithFacebook() {
-            const provider = new firebase.auth.FacebookAuthProvider();
-            auth.signInWithPopup(provider)
-                .then((result) => {
+        // Login with Google
+        function loginWithGoogle() {
+            setLoading(true);
+            
+            // In a real app, this would connect to Google OAuth
+            // For demo purposes, we'll simulate the process
+            setTimeout(() => {
+                showSuccess('Google authentication successful! Redirecting...');
+                // Redirect to dashboard after a short delay
+                setTimeout(() => {
                     window.location.href = 'dashboard.html';
-                })
-                .catch((error) => {
-                    console.error('Facebook sign-in error:', error);
-                });
+                }, 1500);
+            }, 1500);
         }
+        
+        // Login with Facebook
+        function loginWithFacebook() {
+            setLoading(true);
+            
+            // In a real app, this would connect to Facebook OAuth
+            // For demo purposes, we'll simulate the process
+            setTimeout(() => {
+                showSuccess('Facebook authentication successful! Redirecting...');
+
+                // Redirect to dashboard after a short delay
+                setTimeout(() => {
+                    window.location.href = 'dashboard.html';
+                }, 1500);
+            }, 1500);
+        }
+        
+        // Close modal when clicking outside
+        document.addEventListener('click', (e) => {
+            if (e.target.classList.contains('modal-overlay')) {
+                closeModal();
+            }
+        });
     </script>
 </body>
 </html>

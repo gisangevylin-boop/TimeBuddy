@@ -1,335 +1,12 @@
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Time Buddy - Groups</title>
+    <title>Study Groups - Time Buddy</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: #f5f5f5;
-            height: 100vh;
-            overflow: hidden;
-        }
-
-        .container {
-            display: flex;
-            height: 100vh;
-        }
-
-        /* Sidebar Styles */
-        .sidebar {
-            width: 200px;
-            background: white;
-            color: #333;
-            padding: 20px 0;
-            display: flex;
-            flex-direction: column;
-            box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
-        }
-
-        .logo-section {
-            padding: 0 20px;
-            margin-bottom: 40px;
-        }
-
-        .logo {
-            display: flex;
-            align-items: center;
-            font-size: 24px;
-            font-weight: bold;
-        }
-
-        .logo i {
-            margin-right: 10px;
-            color: #4a90e2;
-        }
-
-        .nav-menu {
-            flex: 1;
-            padding: 0 10px;
-        }
-
-        .nav-item {
-            display: flex;
-            align-items: center;
-            padding: 12px 15px;
-            margin-bottom: 5px;
-            cursor: pointer;
-            border-radius: 8px;
-            transition: background-color 0.3s ease;
-            font-size: 14px;
-            text-decoration: none;
-            color: #333;
-        }
-
-        .nav-item:hover {
-            background-color: rgba(123, 185, 232, 0.1);
-        }
-
-        .nav-item.active {
-            background-color: rgba(123, 185, 232, 0.15);
-        }
-
-        .nav-item i {
-            margin-right: 12px;
-            width: 16px;
-            text-align: center;
-        }
-
-        .bottom-nav {
-            padding: 0 10px;
-            border-top: 1px solid rgba(123, 185, 232, 0.2);
-            margin-top: 20px;
-            padding-top: 20px;
-        }
-
-        /* Main Content Styles */
-        .main-content {
-            flex: 1;
-            background: linear-gradient(135deg, #f0f8ff 0%, #e6f3ff 100%);
-            padding: 20px;
-            overflow-y: auto;
-        }
-
-        .groups-container {
-            max-width: 1200px;
-            margin: 0 auto;
-        }
-
-        /* Page Header */
-        .page-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 30px;
-            background: white;
-            padding: 20px 30px;
-            border-radius: 12px;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-        }
-
-        .page-header h1 {
-            color: #333;
-            font-size: 28px;
-            margin: 0;
-        }
-
-        .groups-actions {
-            display: flex;
-            gap: 15px;
-        }
-
-        .create-group-btn {
-            background: #7cb9e8;
-            color: white;
-            border: none;
-            padding: 12px 24px;
-            border-radius: 8px;
-            cursor: pointer;
-            font-weight: 600;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .create-group-btn:hover {
-            background: #5ba3d4;
-        }
-
-        .join-group-btn {
-            background: #5ba3d4;
-            color: white;
-            border: none;
-            padding: 12px 24px;
-            border-radius: 8px;
-            cursor: pointer;
-            font-weight: 600;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .join-group-btn:hover {
-            background: #4a90e2;
-        }
-
-        /* Group Card */
-        .group-card {
-            background: white;
-            border-radius: 12px;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-            padding: 25px;
-            margin-bottom: 20px;
-            transition: transform 0.3s ease;
-        }
-
-        .group-card:hover {
-            transform: translateY(-2px);
-        }
-
-        .group-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 15px;
-        }
-
-        .group-name {
-            font-size: 20px;
-            font-weight: 600;
-            color: #333;
-            margin: 0;
-        }
-
-        .group-status {
-            background: #7cb9e8;
-            color: white;
-            padding: 5px 15px;
-            border-radius: 15px;
-            font-size: 12px;
-            font-weight: 600;
-        }
-
-        .group-subject {
-            color: #666;
-            font-size: 16px;
-            margin-bottom: 20px;
-        }
-
-        .member-section {
-            margin-bottom: 20px;
-        }
-
-        .member-avatars {
-            display: flex;
-            align-items: center;
-            gap: 5px;
-            margin-bottom: 10px;
-        }
-
-        .avatar {
-            width: 35px;
-            height: 35px;
-            border-radius: 50%;
-            background: linear-gradient(135deg, #ddd 0%, #bbb 100%);
-            border: 2px solid white;
-            margin-left: -5px;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-        }
-
-        .avatar:first-child {
-            margin-left: 0;
-        }
-
-        .more-members {
-            margin-left: 10px;
-            color: #666;
-            font-size: 14px;
-        }
-
-        .member-count {
-            font-size: 14px;
-            color: #666;
-            margin-bottom: 10px;
-            display: flex;
-            align-items: center;
-            gap: 5px;
-        }
-
-        .last-meeting {
-            font-size: 14px;
-            color: #999;
-            margin-bottom: 20px;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .group-actions {
-            display: flex;
-            gap: 10px;
-        }
-
-        .add-member-btn {
-            background: #5ba3d4;
-            color: white;
-            border: none;
-            padding: 10px 16px;
-            border-radius: 6px;
-            cursor: pointer;
-            font-size: 12px;
-            font-weight: 600;
-            display: flex;
-            align-items: center;
-            gap: 5px;
-        }
-
-        .add-member-btn:hover {
-            background: #4a90e2;
-        }
-
-        .view-group-btn {
-            background: #f8f9fa;
-            color: #333;
-            border: 1px solid #e0e0e0;
-            padding: 10px 16px;
-            border-radius: 6px;
-            cursor: pointer;
-            font-size: 12px;
-            font-weight: 600;
-        }
-
-        .view-group-btn:hover {
-            background: #e8f4fd;
-            border-color: #7cb9e8;
-        }
-
-        /* Responsive Design */
-        @media (max-width: 768px) {
-            .sidebar {
-                width: 60px;
-            }
-            
-            .sidebar .nav-item span {
-                display: none;
-            }
-            
-            .logo span {
-                display: none;
-            }
-            
-            .page-header {
-                flex-direction: column;
-                gap: 15px;
-                align-items: stretch;
-            }
-            
-            .groups-actions {
-                justify-content: center;
-            }
-
-            .group-header {
-                flex-direction: column;
-                align-items: flex-start;
-                gap: 10px;
-            }
-
-            .group-actions {
-                justify-content: center;
-                flex-wrap: wrap;
-            }
-        }
-    </style>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="group-style.css">
 </head>
 <body>
     <div class="container">
@@ -343,353 +20,185 @@
             </div>
             
             <nav class="nav-menu">
-                <a href="Dashboard Page.html" class="nav-item">
+                <a href="dashboard.html" class="nav-item">
                     <i class="fas fa-home"></i>
                     <span>Dashboard</span>
                 </a>
-                <a href="Timetable page.html" class="nav-item">
+                <a href="timetable.html" class="nav-item">
                     <i class="fas fa-calendar-alt"></i>
                     <span>Timetable</span>
                 </a>
-                <a href="Group page.html" class="nav-item active">
+                <a href="group.html" class="nav-item active">
                     <i class="fas fa-users"></i>
                     <span>Groups</span>
                 </a>
-                <a href="Lecturer consultation page.html" class="nav-item">
+                <a href="lecturer.html" class="nav-item">
                     <i class="fas fa-chalkboard-teacher"></i>
                     <span>Lecturer Consult</span>
                 </a>
-                <a href="Notification page.html" class="nav-item">
+                <a href="notification.html" class="nav-item">
                     <i class="fas fa-bell"></i>
                     <span>Notifications</span>
                 </a>
             </nav>
             
-            <div class="bottom-nav">
-                <div class="nav-item">
-                    <i class="fas fa-sign-in-alt"></i>
-                    <span>Login/SignUp</span>
-                </div>
-                <div class="nav-item">
-                    <i class="fas fa-cog"></i>
-                    <span>Settings</span>
-                </div>
+            <div class="nav-item" onclick="authFunctions.logout()">
+                <i class="fas fa-sign-out-alt"></i>
+                <span>Logout</span>
             </div>
         </div>
-        
+
         <!-- Main Content -->
         <div class="main-content">
             <div class="groups-container">
+                <!-- Page Header -->
                 <div class="page-header">
-                    <h1>My Groups</h1>
+                    <h1>Study Groups</h1>
                     <div class="groups-actions">
                         <button class="create-group-btn">
                             <i class="fas fa-plus"></i>
                             Create Group
                         </button>
                         <button class="join-group-btn">
-                            <i class="fas fa-key"></i>
-                            Join Group Code
+                            <i class="fas fa-user-plus"></i>
+                            Join Group
                         </button>
                     </div>
                 </div>
 
-                <!-- FYP Group Card -->
+                <!-- Group Cards -->
                 <div class="group-card">
                     <div class="group-header">
-                        <h2 class="group-name">FYP Group A</h2>
+                        <h3 class="group-name">Web Development Group</h3>
                         <span class="group-status">Active</span>
                     </div>
-                    
-                    <div class="group-subject">Psychology</div>
+                    <p class="group-subject">Subject: Web Development Fundamentals</p>
                     
                     <div class="member-section">
                         <div class="member-avatars">
                             <div class="avatar"></div>
                             <div class="avatar"></div>
                             <div class="avatar"></div>
-                            <div class="avatar"></div>
-                            <div class="avatar"></div>
-                            <span class="more-members">5+ members</span>
+                            <span class="more-members">+2 more</span>
                         </div>
-                        
-                        <div class="member-count">
+                        <p class="member-count">
                             <i class="fas fa-users"></i>
                             5 members
-                        </div>
-                        
-                        <div class="last-meeting">
-                            <i class="fas fa-calendar"></i>
-                            Last meeting: 3 days ago
-                        </div>
+                        </p>
                     </div>
+                    
+                    <p class="last-meeting">
+                        <i class="fas fa-clock"></i>
+                        Last meeting: Today, 2:30 PM
+                    </p>
                     
                     <div class="group-actions">
                         <button class="add-member-btn">
                             <i class="fas fa-user-plus"></i>
                             Add Member
                         </button>
-                        <button class="view-group-btn">
-                            View Details
+                        <button class="view-group-btn">View Group</button>
+                    </div>
+                </div>
+
+                <div class="group-card">
+                    <div class="group-header">
+                        <h3 class="group-name">Multimedia Systems</h3>
+                        <span class="group-status">Active</span>
+                    </div>
+                    <p class="group-subject">Subject: Multimedia Design Principles</p>
+                    
+                    <div class="member-section">
+                        <div class="member-avatars">
+                            <div class="avatar"></div>
+                            <div class="avatar"></div>
+                            <div class="avatar"></div>
+                            <div class="avatar"></div>
+                            <span class="more-members">+1 more</span>
+                        </div>
+                        <p class="member-count">
+                            <i class="fas fa-users"></i>
+                            6 members
+                        </p>
+                    </div>
+                    
+                    <p class="last-meeting">
+                        <i class="fas fa-clock"></i>
+                        Last meeting: Yesterday, 4:00 PM
+                    </p>
+                    
+                    <div class="group-actions">
+                        <button class="add-member-btn">
+                            <i class="fas fa-user-plus"></i>
+                            Add Member
                         </button>
+                        <button class="view-group-btn">View Group</button>
+                    </div>
+                </div>
+
+                <div class="group-card">
+                    <div class="group-header">
+                        <h3 class="group-name">Data Structures</h3>
+                        <span class="group-status">Planning</span>
+                    </div>
+                    <p class="group-subject">Subject: Advanced Data Structures</p>
+                    
+                    <div class="member-section">
+                        <div class="member-avatars">
+                            <div class="avatar"></div>
+                            <div class="avatar"></div>
+                            <span class="more-members">+0 more</span>
+                        </div>
+                        <p class="member-count">
+                            <i class="fas fa-users"></i>
+                            3 members
+                        </p>
+                    </div>
+                    
+                    <p class="last-meeting">
+                        <i class="fas fa-clock"></i>
+                        No meetings yet
+                    </p>
+                    
+                    <div class="group-actions">
+                        <button class="add-member-btn">
+                            <i class="fas fa-user-plus"></i>
+                            Add Member
+                        </button>
+                        <button class="view-group-btn">View Group</button>
                     </div>
                 </div>
             </div>
         </div>
     </div>
 
-     <script>
-        // Firebase configuration - Replace with your actual config
-        // For Firebase JS SDK v7.20.0 and later, measurementId is optional
-// For Firebase JS SDK v7.20.0 and later, measurementId is optional
-const firebaseConfig = {
-  apiKey: "AIzaSyC5N0pzxGjxNUnFxJlZbkpXvPSkqg5jGdw",
-  authDomain: "timebuddy-d54a3.firebaseapp.com",
-  projectId: "timebuddy-d54a3",
-  storageBucket: "timebuddy-d54a3.firebasestorage.app",
-  messagingSenderId: "235396426991",
-  appId: "1:235396426991:web:c97868da076cd0f58abf1a",
-  measurementId: "G-KF4YRMJ6YE"
-};
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore-compat.js"></script>
+    
+    <!-- Firebase Configuration -->
+    <script src="js/firebase-config.js"></script>
 
-// Initialize Firebase
-firebase.initializeApp(firebaseConfig);
-
-// Initialize services
-const auth = firebase.auth();
-const db = firebase.firestore();
-
-// Export the services
-export { auth, db };
-
-        document.addEventListener('DOMContentLoaded', function() {
-            const authButton = document.getElementById('authButton');
-            const createGroupBtn = document.getElementById('createGroupBtn');
-            const joinGroupBtn = document.getElementById('joinGroupBtn');
-            const createGroupModal = document.getElementById('createGroupModal');
-            const closeModal = document.getElementById('closeModal');
-            const cancelCreate = document.getElementById('cancelCreate');
-            const createGroupForm = document.getElementById('createGroupForm');
-            const groupsList = document.getElementById('groupsList');
-
-            // Check authentication state
-            auth.onAuthStateChanged(user => {
-                if (user) {
-                    authButton.innerHTML = '<i class="fas fa-sign-out-alt"></i><span>Logout</span>';
-                    authButton.onclick = () => auth.signOut();
-                    loadUserGroups(user.uid);
-                } else {
-                    authButton.innerHTML = '<i class="fas fa-sign-in-alt"></i><span>Login/SignUp</span>';
-                    authButton.onclick = () => window.location.href = 'Login Page.html';
-                }
+    <!-- After firebase-config.js -->
+    <script src="js/auth.js"></script>
+    
+    <!-- Auth Functions -->
+    <script>
+        function logout() {
+            auth.signOut().then(() => {
+                window.location.href = 'index.html';
+            }).catch((error) => {
+                console.error('Logout error:', error);
             });
+        }
 
-            // Create group modal handlers
-            createGroupBtn.addEventListener('click', function() {
-                createGroupModal.style.display = 'flex';
-            });
-
-            closeModal.addEventListener('click', function() {
-                createGroupModal.style.display = 'none';
-            });
-
-            cancelCreate.addEventListener('click', function() {
-                createGroupModal.style.display = 'none';
-            });
-
-            // Create group form submission
-            createGroupForm.addEventListener('submit', function(e) {
-                e.preventDefault();
-                
-                const groupName = document.getElementById('groupName').value;
-                const groupSubject = document.getElementById('groupSubject').value;
-                const groupDescription = document.getElementById('groupDescription').value;
-                
-                const user = auth.currentUser;
-                if (user) {
-                    createGroup(user.uid, groupName, groupSubject, groupDescription);
-                }
-            });
-
-            // Join group button
-            joinGroupBtn.addEventListener('click', function() {
-                const groupCode = prompt('Enter group code:');
-                if (groupCode) {
-                    joinGroup(groupCode);
-                }
-            });
-
-            // Load user's groups from Firestore
-            function loadUserGroups(userId) {
-                db.collection('groups')
-                    .where('members', 'array-contains', userId)
-                    .get()
-                    .then(snapshot => {
-                        groupsList.innerHTML = '';
-                        
-                        if (snapshot.empty) {
-                            groupsList.innerHTML = `
-                                <div class="group-card">
-                                    <div class="group-header">
-                                        <h2 class="group-name">No Groups Yet</h2>
-                                    </div>
-                                    <div class="group-subject">Create or join a group to get started</div>
-                                </div>
-                            `;
-                            return;
-                        }
-                        
-                        snapshot.forEach(doc => {
-                            const group = doc.data();
-                            renderGroupCard(doc.id, group);
-                        });
-                    })
-                    .catch(error => {
-                        console.error('Error loading groups:', error);
-                    });
-            }
-
-            // Render group card
-            function renderGroupCard(groupId, group) {
-                const groupCard = document.createElement('div');
-                groupCard.className = 'group-card';
-                groupCard.innerHTML = `
-                    <div class="group-header">
-                        <h2 class="group-name">${group.name}</h2>
-                        <span class="group-status">${group.status || 'Active'}</span>
-                    </div>
-                    <div class="group-subject">${group.subject}</div>
-                    <div class="member-section">
-                        <div class="member-avatars">
-                            ${generateMemberAvatars(group.members)}
-                        </div>
-                        <div class="member-count">
-                            <i class="fas fa-users"></i>
-                            ${group.members ? group.members.length : 0} members
-                        </div>
-                        <div class="last-meeting">
-                            <i class="fas fa-calendar"></i>
-                            Last meeting: ${group.lastMeeting || 'Not scheduled'}
-                        </div>
-                    </div>
-                    <div class="group-actions">
-                        <button class="add-member-btn" data-group="${groupId}">
-                            <i class="fas fa-user-plus"></i>
-                            Add Member
-                        </button>
-                        <button class="view-group-btn" data-group="${groupId}">
-                            View Details
-                        </button>
-                    </div>
-                `;
-                
-                groupsList.appendChild(groupCard);
-                
-                // Add event listeners to buttons
-                groupCard.querySelector('.add-member-btn').addEventListener('click', function() {
-                    addMemberToGroup(this.dataset.group);
-                });
-                
-                groupCard.querySelector('.view-group-btn').addEventListener('click', function() {
-                    viewGroupDetails(this.dataset.group);
-                });
-            }
-
-            // Generate member avatars
-            function generateMemberAvatars(members) {
-                if (!members || members.length === 0) {
-                    return '<div class="avatar"></div><span class="more-members">0 members</span>';
-                }
-                
-                let avatars = '';
-                const displayCount = Math.min(members.length, 5);
-                
-                for (let i = 0; i < displayCount; i++) {
-                    avatars += '<div class="avatar"></div>';
-                }
-                
-                if (members.length > 5) {
-                    avatars += `<span class="more-members">${members.length - 5}+ members</span>`;
-                }
-                
-                return avatars;
-            }
-
-            // Create a new group
-            function createGroup(userId, name, subject, description) {
-                const newGroup = {
-                    name: name,
-                    subject: subject,
-                    description: description,
-                    members: [userId],
-                    createdBy: userId,
-                    createdAt: firebase.firestore.FieldValue.serverTimestamp(),
-                    status: 'Active'
-                };
-                
-                db.collection('groups').add(newGroup)
-                    .then(docRef => {
-                        console.log('Group created with ID:', docRef.id);
-                        createGroupModal.style.display = 'none';
-                        createGroupForm.reset();
-                        loadUserGroups(userId);
-                    })
-                    .catch(error => {
-                        console.error('Error creating group:', error);
-                        alert('Error creating group: ' + error.message);
-                    });
-            }
-
-            // Join a group with code
-            function joinGroup(groupCode) {
-                const user = auth.currentUser;
-                if (!user) return;
-                
-                // In a real app, you would validate the group code
-                // For demo purposes, we'll assume the code is the group ID
-                db.collection('groups').doc(groupCode).get()
-                    .then(doc => {
-                        if (doc.exists) {
-                            const group = doc.data();
-                            const updatedMembers = [...group.members, user.uid];
-                            
-                            db.collection('groups').doc(groupCode).update({
-                                members: updatedMembers
-                            })
-                            .then(() => {
-                                loadUserGroups(user.uid);
-                            })
-                            .catch(error => {
-                                console.error('Error joining group:', error);
-                                alert('Error joining group: ' + error.message);
-                            });
-                        } else {
-                            alert('Group not found');
-                        }
-                    })
-                    .catch(error => {
-                        console.error('Error finding group:', error);
-                        alert('Error finding group: ' + error.message);
-                    });
-            }
-
-            // Add member to group
-            function addMemberToGroup(groupId) {
-                const email = prompt('Enter member email:');
-                if (email) {
-                    // In a real app, you would look up the user by email
-                    // and add their UID to the group members array
-                    alert(`Would add ${email} to group ${groupId}`);
-                }
-            }
-
-            // View group details
-            function viewGroupDetails(groupId) {
-                // In a real app, this would navigate to a group details page
-                alert(`Would view details for group ${groupId}`);
+        auth.onAuthStateChanged((user) => {
+            if (!user && !window.location.pathname.includes('index.html')) {
+                // User is not signed in, redirect to login page
+            window.location.href = 'index.html';
             }
         });
     </script>
 </body>
 </html>
-

@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lecturer Consult - Time Buddy</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="lecturer-style.css">
+</head>
+<body>
+    <div class="container">
+        <!-- Left Sidebar -->
+        <div class="sidebar">
+            <div class="logo-section">
+                <div class="logo">
+                    <i class="fas fa-clock"></i>
+                    <span>Time Buddy</span>
+                </div>
+            </div>
+            
+            <nav class="nav-menu">
+                <a href="dashboard.html" class="nav-item">
+                    <i class="fas fa-home"></i>
+                    <span>Dashboard</span>
+                </a>
+                <a href="timetable.html" class="nav-item">
+                    <i class="fas fa-calendar-alt"></i>
+                    <span>Timetable</span>
+                </a>
+                <a href="group.html" class="nav-item">
+                    <i class="fas fa-users"></i>
+                    <span>Groups</span>
+                </a>
+                <a href="lecturer.html" class="nav-item active">
+                    <i class="fas fa-chalkboard-teacher"></i>
+                    <span>Lecturer Consult</span>
+                </a>
+                <a href="notification.html" class="nav-item">
+                    <i class="fas fa-bell"></i>
+                    <span>Notifications</span>
+                </a>
+            </nav>
+            
+            <div class="nav-item" onclick="authFunctions.logout()">
+                <i class="fas fa-sign-out-alt"></i>
+                <span>Logout</span>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="main-content">
+            <div class="consult-container">
+                <!-- Page Header -->
+                <div class="page-header">
+                    <h1>Lecturer Consultation</h1>
+                    <div class="consult-actions">
+                        <button class="find-lecturer-btn">
+                            <i class="fas fa-search"></i>
+                            Find Lecturer
+                        </button>
+                        <button class="request-consult-btn">
+                            <i class="fas fa-calendar-plus"></i>
+                            Request Consultation
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Consult Sections -->
+                <div class="consult-sections">
+                    <!-- Available Lecturers -->
+                    <div class="consult-section">
+                        <h3 class="section-title">
+                            <i class="fas fa-chalkboard-teacher"></i>
+                            Available Lecturers
+                        </h3>
+                        
+                        <div class="lecturer-item">
+                            <div class="lecturer-avatar">
+                                <i class="fas fa-user"></i>
+                            </div>
+                            <div class="lecturer-info">
+                                <h4>Dr. Sarah Smith</h4>
+                                <p class="lecturer-specialty">Web Development, Database Systems</p>
+                                <p class="availability">Available: Mon, Wed, Fri 2-4 PM</p>
+                            </div>
+                            <button class="book-btn">Book</button>
+                        </div>
+                        
+                        <div class="lecturer-item">
+                            <div class="lecturer-avatar">
+                                <i class="fas fa-user"></i>
+                            </div>
+                            <div class="lecturer-info">
+                                <h4>Prof. John Davis</h4>
+                                <p class="lecturer-specialty">Data Structures, Algorithms</p>
+                                <p class="availability">Available: Tue, Thu 9-11 AM</p>
+                            </div>
+                            <button class="book-btn">Book</button>
+                        </div>
+                        
+                        <div class="lecturer-item">
+                            <div class="lecturer-avatar">
+                                <i class="fas fa-user"></i>
+                            </div>
+                            <div class="lecturer-info">
+                                <h4>Dr. Emily Johnson</h4>
+                                <p class="lecturer-specialty">Multimedia Systems, UI/UX Design</p>
+                                <p class="availability">Available: Mon-Fri 3-5 PM</p>
+                            </div>
+                            <button class="book-btn">Book</button>
+                        </div>
+                    </div>
+
+                    <!-- Request Consultation -->
+                    <div class="consult-section">
+                        <h3 class="section-title">
+                            <i class="fas fa-calendar-plus"></i>
+                            Request Consultation
+                        </h3>
+                        
+                        <div class="form-group">
+                            <label class="form-label">Select Lecturer</label>
+                            <select class="form-select">
+                                <option>Dr. Sarah Smith</option>
+                                <option>Prof. John Davis</option>
+                                <option>Dr. Emily Johnson</option>
+                            </select>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label">Preferred Date</label>
+                            <input type="date" class="form-input">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label">Preferred Time</label>
+                            <select class="form-select">
+                                <option>9:00 AM</option>
+                                <option>10:00 AM</option>
+                                <option>11:00 AM</option>
+                                <option>2:00 PM</option>
+                                <option>3:00 PM</option>
+                                <option>4:00 PM</option>
+                            </select>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label">Reason for Consultation</label>
+                            <textarea class="form-textarea" placeholder="Briefly describe what you'd like to discuss..."></textarea>
+                        </div>
+                        
+                        <button class="request-consultation-btn">Request Consultation</button>
+                    </div>
+                </div>
+
+                <!-- My Consultations -->
+                <div class="consultation-section">
+                    <h3 class="section-title">
+                        <i class="fas fa-calendar-check"></i>
+                        My Consultations
+                    </h3>
+                    
+                    <table class="consultation-table">
+                        <thead>
+                            <tr>
+                                <th>Lecturer</th>
+                                <th>Date & Time</th>
+                                <th>Reason</th>
+                                <th>Status</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Dr. Sarah Smith</td>
+                                <td>Oct 15, 2023 - 2:00 PM</td>
+                                <td>Web Development Project Discussion</td>
+                                <td class="status-confirmed">Confirmed</td>
+                                <td><button class="cancel-btn">Cancel</button></td>
+                            </tr>
+                            <tr>
+                                <td>Prof. John Davis</td>
+                                <td>Oct 18, 2023 - 10:00 AM</td>
+                                <td>Data Structures Assignment Help</td>
+                                <td>Pending</td>
+                                <td><button class="cancel-btn">Cancel</button></td>
+                            </tr>
+                            <tr>
+                                <td>Dr. Emily Johnson</td>
+                                <td>Oct 20, 2023 - 3:00 PM</td>
+                                <td>Multimedia Project Review</td>
+                                <td>Pending</td>
+                                <td><button class="cancel-btn">Cancel</button></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore-compat.js"></script>
+    
+    <!-- Firebase Configuration -->
+    <script src="js/firebase-config.js"></script>
+    
+    <!-- After firebase-config.js -->
+    <script src="js/auth.js"></script>
+    
+    <!-- Auth Functions -->
+    <script>
+        function logout() {
+            auth.signOut().then(() => {
+                window.location.href = 'index.html';
+            }).catch((error) => {
+                console.error('Logout error:', error);
+            });
+        }
+
+        auth.onAuthStateChanged((user) => {
+            if (!user && !window.location.pathname.includes('index.html')) {
+                // User is not signed in, redirect to login page
+                window.location.href = 'index.html';
+            }
+        });
+    </script>
+</body>
+</html>

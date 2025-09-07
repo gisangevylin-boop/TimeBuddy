@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Timetable - Time Buddy</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="timetable-style.css">
+</head>
+<body>
+    <div class="container">
+        <!-- Left Sidebar -->
+        <div class="sidebar">
+            <div class="logo-section">
+                <div class="logo">
+                    <i class="fas fa-clock"></i>
+                    <span>Time Buddy</span>
+                </div>
+            </div>
+            
+            <nav class="nav-menu">
+                <a href="dashboard.html" class="nav-item">
+                    <i class="fas fa-home"></i>
+                    <span>Dashboard</span>
+                </a>
+                <a href="timetable.html" class="nav-item active">
+                    <i class="fas fa-calendar-alt"></i>
+                    <span>Timetable</span>
+                </a>
+                <a href="group.html" class="nav-item">
+                    <i class="fas fa-users"></i>
+                    <span>Groups</span>
+                </a>
+                <a href="lecturer.html" class="nav-item">
+                    <i class="fas fa-chalkboard-teacher"></i>
+                    <span>Lecturer Consult</span>
+                </a>
+                <a href="notification.html" class="nav-item">
+                    <i class="fas fa-bell"></i>
+                    <span>Notifications</span>
+                </a>
+            </nav>
+            
+            <div class="nav-item" onclick="authFunctions.logout()">
+                <i class="fas fa-sign-out-alt"></i>
+                <span>Logout</span>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="main-content">
+            <div class="timetable-container">
+                <!-- Page Header -->
+                <div class="page-header">
+                    <h1>Timetable</h1>
+                    <div class="search-box">
+                        <input type="text" class="search-input" placeholder="Search classes...">
+                        <i class="fas fa-search search-icon"></i>
+                    </div>
+                </div>
+
+                <!-- Timetable Controls -->
+                <div class="timetable-controls">
+                    <div class="file-upload">
+                        <div class="file-input">
+                            <i class="fas fa-upload"></i>
+                            <span>Upload Timetable</span>
+                        </div>
+                        <span class="file-status">No file selected</span>
+                    </div>
+                    
+                    <button class="generate-btn">Generate Optimal Schedule</button>
+                    
+                    <div class="time-blocks">
+                        <span class="time-block">8:00-9:30</span>
+                        <span class="time-block">10:00-11:30</span>
+                        <span class="time-block">12:00-1:30</span>
+                        <span class="time-block">2:00-3:30</span>
+                        <span class="time-block">4:00-5:30</span>
+                    </div>
+                </div>
+
+                <!-- Timetable Grid -->
+                <div class="timetable-grid">
+                    <div class="time-header">
+                        <div>Time/Day</div>
+                        <div>Monday</div>
+                        <div>Tuesday</div>
+                        <div>Wednesday</div>
+                        <div>Thursday</div>
+                        <div>Friday</div>
+                    </div>
+                    
+                    <div class="day-row">
+                        <div class="day-label">8:00-9:30</div>
+                        <div class="time-slot">
+                            <div class="class-block web-dev">Web Development<br>Room 301</div>
+                        </div>
+                        <div class="time-slot"></div>
+                        <div class="time-slot">
+                            <div class="class-block data-structure">Data Structures<br>Room 205</div>
+                        </div>
+                        <div class="time-slot"></div>
+                        <div class="time-slot">
+                            <div class="class-block web-dev">Web Development<br>Room 301</div>
+                        </div>
+                    </div>
+                    
+                    <div class="day-row">
+                        <div class="day-label">10:00-11:30</div>
+                        <div class="time-slot">
+                            <div class="class-block multimedia">Multimedia Systems<br>Lab 102</div>
+                        </div>
+                        <div class="time-slot">
+                            <div class="class-block data-structure">Data Structures<br>Room 205</div>
+                        </div>
+                        <div class="time-slot"></div>
+                        <div class="time-slot">
+                            <div class="class-block multimedia">Multimedia Systems<br>Lab 102</div>
+                        </div>
+                        <div class="time-slot"></div>
+                    </div>
+                    
+                    <div class="day-row">
+                        <div class="day-label">12:00-1:30</div>
+                        <div class="time-slot"></div>
+                        <div class="time-slot">
+                            <div class="class-block mhu">MHU<br>Room 110</div>
+                        </div>
+                        <div class="time-slot"></div>
+                        <div class="time-slot">
+                            <div class="class-block mhu">MHU<br>Room 110</div>
+                        </div>
+                        <div class="time-slot"></div>
+                    </div>
+                    
+                    <div class="day-row">
+                        <div class="day-label">2:00-3:30</div>
+                        <div class="time-slot">
+                            <div class="class-block data-structure">Data Structures<br>Room 205</div>
+                        </div>
+                        <div class="time-slot"></div>
+                        <div class="time-slot">
+                            <div class="class-block web-dev">Web Development<br>Room 301</div>
+                        </div>
+                        <div class="time-slot"></div>
+                        <div class="time-slot">
+                            <div class="class-block multimedia">Multimedia Systems<br>Lab 102</div>
+                        </div>
+                    </div>
+                    
+                    <div class="day-row">
+                        <div class="day-label">4:00-5:30</div>
+                        <div class="time-slot"></div>
+                        <div class="time-slot">
+                            <div class="class-block mhu">MHU<br>Room 110</div>
+                        </div>
+                        <div class="time-slot"></div>
+                        <div class="time-slot">
+                            <div class="class-block data-structure">Data Structures<br>Room 205</div>
+                        </div>
+                        <div class="time-slot"></div>
+                    </div>
+                </div>
+                
+                <button class="add-classes-btn">
+                    <i class="fas fa-plus"></i>
+                    Add Classes
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore-compat.js"></script>
+    
+    <!-- Firebase Configuration -->
+    <script src="js/firebase-config.js"></script>
+
+    <!-- After firebase-config.js -->
+    <script src="js/auth.js"></script>
+    
+    <!-- Auth Functions -->
+    <script>
+        function logout() {
+            auth.signOut().then(() => {
+                window.location.href = 'index.html';
+            }).catch((error) => {
+                console.error('Logout error:', error);
+            });
+        }
+
+        auth.onAuthStateChanged((user) => {
+            if (!user && !window.location.pathname.includes('index.html')) {
+                // User is not signed in, redirect to login page
+                window.location.href = 'index.html';
+            }
+        });
+    </script>
+</body>
+</html>

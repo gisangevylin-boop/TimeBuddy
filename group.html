@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Study Groups - Time Buddy</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="group-style.css">
+</head>
+<body>
+    <div class="container">
+        <!-- Left Sidebar -->
+        <div class="sidebar">
+            <div class="logo-section">
+                <div class="logo">
+                    <i class="fas fa-clock"></i>
+                    <span>Time Buddy</span>
+                </div>
+            </div>
+            
+            <nav class="nav-menu">
+                <a href="dashboard.html" class="nav-item">
+                    <i class="fas fa-home"></i>
+                    <span>Dashboard</span>
+                </a>
+                <a href="timetable.html" class="nav-item">
+                    <i class="fas fa-calendar-alt"></i>
+                    <span>Timetable</span>
+                </a>
+                <a href="group.html" class="nav-item active">
+                    <i class="fas fa-users"></i>
+                    <span>Groups</span>
+                </a>
+                <a href="lecturer.html" class="nav-item">
+                    <i class="fas fa-chalkboard-teacher"></i>
+                    <span>Lecturer Consult</span>
+                </a>
+                <a href="notification.html" class="nav-item">
+                    <i class="fas fa-bell"></i>
+                    <span>Notifications</span>
+                </a>
+            </nav>
+            
+            <div class="nav-item" onclick="authFunctions.logout()">
+                <i class="fas fa-sign-out-alt"></i>
+                <span>Logout</span>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="main-content">
+            <div class="groups-container">
+                <!-- Page Header -->
+                <div class="page-header">
+                    <h1>Study Groups</h1>
+                    <div class="groups-actions">
+                        <button class="create-group-btn">
+                            <i class="fas fa-plus"></i>
+                            Create Group
+                        </button>
+                        <button class="join-group-btn">
+                            <i class="fas fa-user-plus"></i>
+                            Join Group
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Group Cards -->
+                <div class="group-card">
+                    <div class="group-header">
+                        <h3 class="group-name">Web Development Group</h3>
+                        <span class="group-status">Active</span>
+                    </div>
+                    <p class="group-subject">Subject: Web Development Fundamentals</p>
+                    
+                    <div class="member-section">
+                        <div class="member-avatars">
+                            <div class="avatar"></div>
+                            <div class="avatar"></div>
+                            <div class="avatar"></div>
+                            <span class="more-members">+2 more</span>
+                        </div>
+                        <p class="member-count">
+                            <i class="fas fa-users"></i>
+                            5 members
+                        </p>
+                    </div>
+                    
+                    <p class="last-meeting">
+                        <i class="fas fa-clock"></i>
+                        Last meeting: Today, 2:30 PM
+                    </p>
+                    
+                    <div class="group-actions">
+                        <button class="add-member-btn">
+                            <i class="fas fa-user-plus"></i>
+                            Add Member
+                        </button>
+                        <button class="view-group-btn">View Group</button>
+                    </div>
+                </div>
+
+                <div class="group-card">
+                    <div class="group-header">
+                        <h3 class="group-name">Multimedia Systems</h3>
+                        <span class="group-status">Active</span>
+                    </div>
+                    <p class="group-subject">Subject: Multimedia Design Principles</p>
+                    
+                    <div class="member-section">
+                        <div class="member-avatars">
+                            <div class="avatar"></div>
+                            <div class="avatar"></div>
+                            <div class="avatar"></div>
+                            <div class="avatar"></div>
+                            <span class="more-members">+1 more</span>
+                        </div>
+                        <p class="member-count">
+                            <i class="fas fa-users"></i>
+                            6 members
+                        </p>
+                    </div>
+                    
+                    <p class="last-meeting">
+                        <i class="fas fa-clock"></i>
+                        Last meeting: Yesterday, 4:00 PM
+                    </p>
+                    
+                    <div class="group-actions">
+                        <button class="add-member-btn">
+                            <i class="fas fa-user-plus"></i>
+                            Add Member
+                        </button>
+                        <button class="view-group-btn">View Group</button>
+                    </div>
+                </div>
+
+                <div class="group-card">
+                    <div class="group-header">
+                        <h3 class="group-name">Data Structures</h3>
+                        <span class="group-status">Planning</span>
+                    </div>
+                    <p class="group-subject">Subject: Advanced Data Structures</p>
+                    
+                    <div class="member-section">
+                        <div class="member-avatars">
+                            <div class="avatar"></div>
+                            <div class="avatar"></div>
+                            <span class="more-members">+0 more</span>
+                        </div>
+                        <p class="member-count">
+                            <i class="fas fa-users"></i>
+                            3 members
+                        </p>
+                    </div>
+                    
+                    <p class="last-meeting">
+                        <i class="fas fa-clock"></i>
+                        No meetings yet
+                    </p>
+                    
+                    <div class="group-actions">
+                        <button class="add-member-btn">
+                            <i class="fas fa-user-plus"></i>
+                            Add Member
+                        </button>
+                        <button class="view-group-btn">View Group</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore-compat.js"></script>
+    
+    <!-- Firebase Configuration -->
+    <script src="js/firebase-config.js"></script>
+
+    <!-- After firebase-config.js -->
+    <script src="js/auth.js"></script>
+    
+    <!-- Auth Functions -->
+    <script>
+        function logout() {
+            auth.signOut().then(() => {
+                window.location.href = 'index.html';
+            }).catch((error) => {
+                console.error('Logout error:', error);
+            });
+        }
+
+        auth.onAuthStateChanged((user) => {
+            if (!user && !window.location.pathname.includes('index.html')) {
+                // User is not signed in, redirect to login page
+            window.location.href = 'index.html';
+            }
+        });
+    </script>
+</body>
+</html>

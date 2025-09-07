@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Notifications - Time Buddy</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="notification-style.css">
+</head>
+<body>
+    <div class="container">
+        <!-- Left Sidebar -->
+        <div class="sidebar">
+            <div class="logo-section">
+                <div class="logo">
+                    <i class="fas fa-clock"></i>
+                    <span>Time Buddy</span>
+                </div>
+            </div>
+            
+            <nav class="nav-menu">
+                <a href="dashboard.html" class="nav-item">
+                    <i class="fas fa-home"></i>
+                    <span>Dashboard</span>
+                </a>
+                <a href="timetable.html" class="nav-item">
+                    <i class="fas fa-calendar-alt"></i>
+                    <span>Timetable</span>
+                </a>
+                <a href="group.html" class="nav-item">
+                    <i class="fas fa-users"></i>
+                    <span>Groups</span>
+                </a>
+                <a href="lecturer.html" class="nav-item">
+                    <i class="fas fa-chalkboard-teacher"></i>
+                    <span>Lecturer Consult</span>
+                </a>
+                <a href="notification.html" class="nav-item active">
+                    <i class="fas fa-bell"></i>
+                    <span>Notifications</span>
+                </a>
+            </nav>
+            
+            <div class="nav-item" onclick="authFunctions.logout()">
+                <i class="fas fa-sign-out-alt"></i>
+                <span>Logout</span>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="main-content">
+            <div class="notifications-container">
+                <!-- Page Header -->
+                <div class="page-header">
+                    <h1>Notifications</h1>
+                    <button class="mark-all-read-btn">
+                        <i class="fas fa-check-double"></i>
+                        Mark All as Read
+                    </button>
+                </div>
+
+                <!-- Notifications List -->
+                <div class="notifications-list">
+                    <h3 class="list-title">
+                        <i class="fas fa-bell"></i>
+                        Recent Notifications
+                    </h3>
+                    
+                    <div class="notification-item booking-approved">
+                        <div class="notification-content">
+                            <div class="notification-icon icon-success">
+                                <i class="fas fa-calendar-check"></i>
+                            </div>
+                            <div class="notification-header">
+                                <h4 class="notification-title">Consultation Approved</h4>
+                                <span class="notification-time">2 hours ago</span>
+                            </div>
+                            <p class="notification-message">
+                                Your consultation request with Dr. Sarah Smith for October 15, 2023 at 2:00 PM has been approved.
+                            </p>
+                        </div>
+                    </div>
+                    
+                    <div class="notification-item system-announcement">
+                        <div class="notification-content">
+                            <div class="notification-icon icon-info">
+                                <i class="fas fa-info-circle"></i>
+                            </div>
+                            <div class="notification-header">
+                                <h4 class="notification-title">System Maintenance</h4>
+                                <span class="notification-time">5 hours ago</span>
+                            </div>
+                            <p class="notification-message">
+                                Scheduled maintenance will occur on October 12, 2023 from 2:00 AM to 4:00 AM. The system may be unavailable during this time.
+                            </p>
+                        </div>
+                    </div>
+                    
+                    <div class="notification-item new-messages">
+                        <div class="notification-content">
+                            <div class="notification-icon icon-message">
+                                <i class="fas fa-comments"></i>
+                            </div>
+                            <div class="notification-header">
+                                <h4 class="notification-title">New Group Messages</h4>
+                                <span class="notification-time">Yesterday</span>
+                            </div>
+                            <p class="notification-message">
+                                You have 5 unread messages in the Web Development Group chat.
+                            </p>
+                        </div>
+                    </div>
+                    
+                    <div class="notification-item booking-approved">
+                        <div class="notification-content">
+                            <div class="notification-icon icon-success">
+                                <i class="fas fa-user-plus"></i>
+                            </div>
+                            <div class="notification-header">
+                                <h4 class="notification-title">New Group Member</h4>
+                                <span class="notification-time">2 days ago</span>
+                            </div>
+                            <p class="notification-message">
+                                John Doe has joined your Web Development study group.
+                            </p>
+                        </div>
+                    </div>
+                    
+                    <div class="notification-item system-announcement">
+                        <div class="notification-content">
+                            <div class="notification-icon icon-info">
+                                <i class="fas fa-book"></i>
+                            </div>
+                            <div class="notification-header">
+                                <h4 class="notification-title">Class Reminder</h4>
+                                <span class="notification-time">3 days ago</span>
+                            </div>
+                            <p class="notification-message">
+                                Reminder: Your Web Development class starts in 30 minutes.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore-compat.js"></script>
+    
+    <!-- Firebase Configuration -->
+    <script src="js/firebase-config.js"></script>
+
+    <!-- After firebase-config.js -->
+    <script src="js/auth.js"></script>
+    
+    <!-- Auth Functions -->
+    <script>
+        function logout() {
+            auth.signOut().then(() => {
+                window.location.href = 'index.html';
+            }).catch((error) => {
+                console.error('Logout error:', error);
+            });
+        }
+
+        auth.onAuthStateChanged((user) => {
+            if (!user && !window.location.pathname.includes('index.html')) {
+                // User is not signed in, redirect to login page
+                window.location.href = 'index.html';
+            }
+        });
+    </script>
+</body>
+</html>

@@ -409,7 +409,7 @@
             // In a real app, you would send this to your backend
             // For demo purposes, we'll simulate a login process
             setTimeout(() => {
-                if (email === 'demo@example.com' && password === 'password') {
+                if (email === '' && password === '') {
                     showSuccess('Login successful! Redirecting...');
                     // Redirect to dashboard after a short delay
                     setTimeout(() => {
@@ -479,4 +479,5 @@
         }, 2000);
     </script>
 </body>
+
 </html>

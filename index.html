@@ -217,7 +217,6 @@
             </div>
         </div>
 
-
         <!-- Main Content -->
         <div class="main-content">
             <div class="login-container">
@@ -231,7 +230,6 @@
                     
                     <div class="login-form">
                         <div class="error-message" id="errorMessage"></div>
-                        <div class="success-message" id="successMessage"></div>
                         
                         <div class="input-group">
                             <input type="email" id="email" class="input-field" placeholder="Email" required>
@@ -241,25 +239,20 @@
                             <input type="password" id="password" class="input-field" placeholder="Password" required>
                         </div>
                         
-                        <button class="login-btn" onclick="login()">
-                            <span id="loginText">Login</span>
-                            <div class="loader" id="loginLoader">
-                                <div class="spinner"></div>
-                            </div>
-                        </button>
+                        <button class="login-btn" onclick="login()">Login</button>
                         
                         <div class="forgot-password">
-                            <a href="#" onclick="showResetPasswordModal()">Forgot Password?</a>
+                            <a href="#">Forgot Password?</a>
                         </div>
                         
-                        <button class="signup-btn" onclick="showSignupModal()">Create New Account</button>
+                        <button class="signup-btn" onclick="showSignup()">Create New Account</button>
                         
                         <div class="social-login">
-                            <button class="social-btn google-btn" onclick="loginWithGoogle()">
-                                <i class="fab fa-google"></i> Google
+                            <button class="google-btn" onclick="loginWithGoogle()">
+                                <i class="fab fa-google"></i>
                             </button>
-                            <button class="social-btn facebook-btn" onclick="loginWithFacebook()">
-                                <i class="fab fa-facebook-f"></i> Facebook
+                            <button class="facebook-btn" onclick="loginWithFacebook()">
+                                <i class="fab fa-facebook-f"></i>
                             </button>
                         </div>
                     </div>
@@ -268,37 +261,21 @@
         </div>
     </div>
 
-    <!-- Firebase SDK -->
-    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore-compat.js"></script>
-    
-    <!-- Firebase Configuration -->
-    <script>
-        // Your web app's Firebase configuration
-        const firebaseConfig = {
-            apiKey: "AIzaSyC5N0pzxGjxNUnFxJlZbkpXvPSkqg5jGdw",
-            authDomain: "timebuddy-d54a3.firebaseapp.com",
-            projectId: "timebuddy-d54a3",
-            storageBucket: "timebuddy-d54a3.firebasestorage.app",
-            messagingSenderId: "235396426991",
-            appId: "1:235396426991:web:c97868da076cd0f58abf1a",
-            measurementId: "G-KF4YRMJ6YE"
-        };
-        
-        // Initialize Firebase
-        firebase.initializeApp(firebaseConfig);
-        const auth = firebase.auth();
-        const db = firebase.firestore();
-    </script>
 
-    <!-- Auth Functions -->
     <script>
         // UI elements
         const errorMessage = document.getElementById('errorMessage');
         const successMessage = document.getElementById('successMessage');
         const loginText = document.getElementById('loginText');
         const loginLoader = document.getElementById('loginLoader');
+        
+        // Clear any autofilled values on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            setTimeout(function() {
+                document.getElementById('email').value = '';
+                document.getElementById('password').value = '';
+            }, 100);
+        });
         
         // Show error message
         function showError(message) {
@@ -318,7 +295,7 @@
         function setLoading(loading) {
             if (loading) {
                 loginText.style.display = 'none';
-                loginLoader.style.display = 'block';
+                loginLoader.style.display = 'flex';
             } else {
                 loginText.style.display = 'block';
                 loginLoader.style.display = 'none';
@@ -437,14 +414,14 @@
             closeModal();
         }
         
-        // Login with GitHub (simulated for demo)
-        function loginWithGitHub() {
+        // Login with Google
+        function loginWithGoogle() {
             setLoading(true);
             
-            // In a real app, this would connect to GitHub OAuth
+            // In a real app, this would connect to Google OAuth
             // For demo purposes, we'll simulate the process
             setTimeout(() => {
-                showSuccess('GitHub authentication successful! Redirecting...');
+                showSuccess('Google authentication successful! Redirecting...');
                 // Redirect to dashboard after a short delay
                 setTimeout(() => {
                     window.location.href = 'dashboard.html';
@@ -452,18 +429,19 @@
             }, 1500);
         }
         
-        // Login with Google
-        function loginWithGoogle() {
-            // In a real app, this would connect to Firebase
-            // For demo purposes, we'll show a message
-            showError('Google authentication requires a server environment. Try the email login or GitHub.');
-        }
-        
         // Login with Facebook
         function loginWithFacebook() {
-            // In a real app, this would connect to Firebase
-            // For demo purposes, we'll show a message
-            showError('Facebook authentication requires a server environment. Try the email login or GitHub.');
+            setLoading(true);
+            
+            // In a real app, this would connect to Facebook OAuth
+            // For demo purposes, we'll simulate the process
+            setTimeout(() => {
+                showSuccess('Facebook authentication successful! Redirecting...');
+                // Redirect to dashboard after a short delay
+                setTimeout(() => {
+                    window.location.href = 'dashboard.html';
+                }, 1500);
+            }, 1500);
         }
         
         // Close modal when clicking outside
@@ -474,7 +452,4 @@
         });
     </script>
 </body>
-
 </html>
-
-

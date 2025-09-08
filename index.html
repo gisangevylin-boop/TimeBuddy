@@ -63,6 +63,14 @@
 
         .input-group {
             margin-bottom: 20px;
+            position: relative;
+        }
+
+        .input-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: #333;
         }
 
         .input-field {
@@ -73,6 +81,7 @@
             font-size: 14px;
             transition: border-color 0.3s ease;
             outline: none;
+            box-sizing: border-box;
         }
 
         .input-field:focus {
@@ -91,6 +100,8 @@
             cursor: pointer;
             transition: transform 0.3s ease;
             margin-bottom: 15px;
+            position: relative;
+            height: 50px;
         }
 
         .login-btn:hover {
@@ -111,6 +122,16 @@
         .error-message {
             color: #d32f2f;
             background-color: #ffebee;
+            padding: 10px;
+            border-radius: 4px;
+            margin-bottom: 15px;
+            text-align: center;
+            display: none;
+        }
+
+        .success-message {
+            color: #388e3c;
+            background-color: #e8f5e9;
             padding: 10px;
             border-radius: 4px;
             margin-bottom: 15px;
@@ -146,30 +167,117 @@
             gap: 15px;
         }
 
-        .google-btn,
-        .facebook-btn {
-            width: 50px;
+        .social-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 140px;
             height: 50px;
-            border-radius: 50%;
+            border-radius: 8px;
             border: none;
             cursor: pointer;
-            font-size: 18px;
+            font-size: 16px;
             transition: transform 0.3s ease;
+            color: white;
+            font-weight: 500;
         }
 
         .google-btn {
             background: #db4437;
-            color: white;
         }
 
         .facebook-btn {
             background: #3b5998;
+        }
+
+        .social-btn:hover {
+            transform: scale(1.05);
+        }
+
+        .social-btn i {
+            margin-right: 8px;
+        }
+
+        /* Loader styles */
+        .loader {
+            display: none;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+
+        .spinner {
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top-color: white;
+            animation: spin 1s ease-in-out infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* Modal styles */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .modal-content {
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            width: 90%;
+            max-width: 400px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+        }
+
+        .modal-content h2 {
+            margin-bottom: 20px;
+            text-align: center;
+            color: #333;
+        }
+
+        .modal-content input {
+            width: 100%;
+            padding: 12px;
+            margin-bottom: 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 14px;
+            box-sizing: border-box;
+        }
+
+        .modal-content button {
+            width: 100%;
+            padding: 12px;
+            margin-bottom: 10px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 600;
+        }
+
+        .modal-content button:first-of-type {
+            background: #5ba3d4;
             color: white;
         }
 
-        .google-btn:hover,
-        .facebook-btn:hover {
-            transform: scale(1.1);
+        .modal-content button:last-of-type {
+            background: #e0e0e0;
+            color: #333;
         }
     </style>
 </head>
@@ -213,7 +321,7 @@
             </nav>
             
             <div class="forgot-password">
-                <a href="#" onclick="resetPassword()">Forgot Password?</a>
+                <a href="#" onclick="showResetPasswordModal()">Forgot Password?</a>
             </div>
         </div>
 
@@ -232,30 +340,28 @@
                         <div class="error-message" id="errorMessage"></div>
                         <div class="success-message" id="successMessage"></div>
 
-                        <form autocomplete="off">
-                        <div class="input-group">
-                            <label for="email">Email</label>
-                            <input type="email" id="email" class="input-field" placeholder="Enter your email" autocomplete="off" required>
-                            <i class="fas fa-envelope"></i>
-                        </div>
-                        
-                        <div class="input-group">
-                            <label for="password">Password</label>
-                            <input type="password" id="password" class="input-field" placeholder="Enter your password" autocomplete="new-password" required>
-                            <i class="fas fa-lock"></i>
-                        </div>
-                        
-                        <button type="button" class="login-btn" onclick="login()">
-                            <span id="loginText">Login</span>
-                            <div class="loader" id="loginLoader">
-                                <div class="spinner"></div>
+                        <form id="loginForm" autocomplete="off">
+                            <div class="input-group">
+                                <label for="email">Email</label>
+                                <input type="email" id="email" class="input-field" placeholder="Enter your email" autocomplete="off" required>
                             </div>
-                        </button>
-                    </form>
+                            
+                            <div class="input-group">
+                                <label for="password">Password</label>
+                                <input type="password" id="password" class="input-field" placeholder="Enter your password" autocomplete="new-password" required>
+                            </div>
+                            
+                            <button type="submit" class="login-btn" id="loginButton">
+                                <span id="loginText">Login</span>
+                                <div class="loader" id="loginLoader">
+                                    <div class="spinner"></div>
+                                </div>
+                            </button>
+                        </form>
                         
                         <div class="forgot-password">
-                        <a href="#" onclick="showResetPasswordModal()">Forgot Password?</a>
-                    </div>
+                            <a href="#" onclick="showResetPasswordModal()">Forgot Password?</a>
+                        </div>
                         
                         <button class="signup-btn" onclick="showSignup()">Create New Account</button>
                         
@@ -263,7 +369,7 @@
                             <button class="social-btn google-btn" onclick="loginWithGoogle()">
                                 <i class="fab fa-google"></i> Google
                             </button>
-                            <button class="soscial-btn facebook-btn" onclick="loginWithFacebook()">
+                            <button class="social-btn facebook-btn" onclick="loginWithFacebook()">
                                 <i class="fab fa-facebook-f"></i> Facebook
                             </button>
                         </div>
@@ -272,149 +378,214 @@
             </div>
         </div>
     </div>
-
-<!-- Firebase SDK -->
+    
+    <!-- Load Firebase SDK FIRST -->
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore-compat.js"></script>
-    
-    <!-- Firebase Configuration -->
+
+    <!-- Then load your Firebase config -->
     <script src="firebase-config.js"></script>
 
-    // After firebase-config.js
-    <script src="auth.js"></script>
-
-    <!-- Auth Functions -->
-<script>
-    // Initialize Firebase
-    const app = firebase.initializeApp(firebaseConfig);
-    const auth = firebase.auth();
-    const db = firebase.firestore();
-    
-    function showSignup() {
-        // Create a modal for signup
-        const signupModal = document.createElement('div');
-        signupModal.innerHTML = `
-            <div class="modal-overlay">
-                <div class="modal-content">
-                    <h2>Create Account</h2>
-                    <input type="text" id="signupName" placeholder="Full Name">
-                    <input type="email" id="signupEmail" placeholder="Email">
-                    <input type="password" id="signupPassword" placeholder="Password">
-                    <input type="password" id="signupConfirmPassword" placeholder="Confirm Password">
-                    <button onclick="register()">Register</button>
-                    <button onclick="closeModal()">Cancel</button>
-                </div>
-            </div>
-        `;
-        document.body.appendChild(signupModal);
-    }
-
-    function register() {
-        const name = document.getElementById('signupName').value;
-        const email = document.getElementById('signupEmail').value;
-        const password = document.getElementById('signupPassword').value;
-        const confirmPassword = document.getElementById('signupConfirmPassword').value;
-
-        if (password !== confirmPassword) {
-            alert("Passwords don't match");
-            return;
-        }   
-
-        // Create user with email and password
-        auth.createUserWithEmailAndPassword(email, password)
-            .then((userCredential) => {
-                // Add user data to Firestore
-                return db.collection('users').doc(userCredential.user.uid).set({
-                    name: name,
-                    email: email,
-                    createdAt: firebase.firestore.FieldValue.serverTimestamp()
+    <!-- Then your auth functions -->
+    <script>
+        // Initialize Firebase
+        console.log('Initializing Firebase...');
+        let auth, db;
+        
+        try {
+            const app = firebase.initializeApp(firebaseConfig);
+            auth = firebase.auth();
+            db = firebase.firestore();
+            console.log('Firebase initialized successfully');
+        } catch (error) {
+            console.error('Firebase initialization error:', error);
+        }
+        
+        // Add event listeners when DOM is loaded
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('DOM loaded');
+            
+            // Add form submission handler
+            const loginForm = document.getElementById('loginForm');
+            if (loginForm) {
+                loginForm.addEventListener('submit', function(e) {
+                    e.preventDefault();
+                    login();
                 });
-            })
-            .then(() => {
-                alert('Account created successfully!');
-                closeModal();
-            })
-            .catch((error) => {
-                alert('Error: ' + error.message);
-            });
-    }
+            }
+            
+            // Check if user is already logged in
+            if (auth) {
+                auth.onAuthStateChanged((user) => {
+                    if (user) {
+                        console.log('User already logged in:', user.email);
+                        window.location.href = 'dashboard.html';
+                    }
+                });
+            }
+        });
 
-    function closeModal() {
-        const modal = document.querySelector('.modal-overlay');
-        if (modal) {
-            modal.remove();
+        function showSignup() {
+            // Create a modal for signup
+            const signupModal = document.createElement('div');
+            signupModal.innerHTML = `
+                <div class="modal-overlay">
+                    <div class="modal-content">
+                        <h2>Create Account</h2>
+                        <input type="text" id="signupName" placeholder="Full Name">
+                        <input type="email" id="signupEmail" placeholder="Email">
+                        <input type="password" id="signupPassword" placeholder="Password">
+                        <input type="password" id="signupConfirmPassword" placeholder="Confirm Password">
+                        <button onclick="register()">Register</button>
+                        <button onclick="closeModal()">Cancel</button>
+                    </div>
+                </div>
+            `;
+            document.body.appendChild(signupModal);
         }
-    }
 
-    function login() {
-        const email = document.getElementById('email').value;
-        const password = document.getElementById('password').value;
-        const errorMessage = document.getElementById('errorMessage');
+        function register() {
+            const name = document.getElementById('signupName').value;
+            const email = document.getElementById('signupEmail').value;
+            const password = document.getElementById('signupPassword').value;
+            const confirmPassword = document.getElementById('signupConfirmPassword').value;
 
-        if (!email || !password) {
-            errorMessage.textContent = 'Please enter both email and password';
-            errorMessage.style.display = 'block';
-            return;
+            if (password !== confirmPassword) {
+                alert("Passwords don't match");
+                return;
+            }   
+
+            // Create user with email and password
+            auth.createUserWithEmailAndPassword(email, password)
+                .then((userCredential) => {
+                    // Add user data to Firestore
+                    return db.collection('users').doc(userCredential.user.uid).set({
+                        name: name,
+                        email: email,
+                        createdAt: firebase.firestore.FieldValue.serverTimestamp()
+                    });
+                })
+                .then(() => {
+                    alert('Account created successfully!');
+                    closeModal();
+                })
+                .catch((error) => {
+                    console.error('Registration error:', error);
+                    alert('Error: ' + error.message);
+                });
         }
 
-        // Sign in with email and password
-        auth.signInWithEmailAndPassword(email, password)
-            .then((userCredential) => {
-                // Redirect to dashboard on successful login
-                window.location.href = 'dashboard.html';
-            })
-            .catch((error) => {
-                console.error('Login error:', error);
-                errorMessage.textContent = 'Invalid email or password';
+        function closeModal() {
+            const modal = document.querySelector('.modal-overlay');
+            if (modal) {
+                modal.remove();
+            }
+        }
+
+        function login() {
+            console.log('Login function called');
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            const errorMessage = document.getElementById('errorMessage');
+            const loginButton = document.getElementById('loginButton');
+            const loginText = document.getElementById('loginText');
+            const loginLoader = document.getElementById('loginLoader');
+
+            if (!email || !password) {
+                errorMessage.textContent = 'Please enter both email and password';
                 errorMessage.style.display = 'block';
-            });
-    }       
+                return;
+            }
 
-    function resetPassword() {
-        const email = document.getElementById('email').value;
+            // Show loading state
+            loginText.style.display = 'none';
+            loginLoader.style.display = 'block';
+            loginButton.disabled = true;
 
-        if (!email) {
-            alert('Please enter your email address');
-            return;
+            console.log('Attempting to login with:', email);
+            
+            // Sign in with email and password
+            auth.signInWithEmailAndPassword(email, password)
+                .then((userCredential) => {
+                    console.log('Login successful:', userCredential.user);
+                    // Redirect to dashboard on successful login
+                    window.location.href = 'dashboard.html';
+                })
+                .catch((error) => {
+                    console.error('Login error:', error);
+                    errorMessage.textContent = 'Invalid email or password: ' + error.message;
+                    errorMessage.style.display = 'block';
+                    
+                    // Reset button state
+                    loginText.style.display = 'block';
+                    loginLoader.style.display = 'none';
+                    loginButton.disabled = false;
+                });
+        }       
+
+        function resetPassword() {
+            const email = document.getElementById('resetEmail').value;
+
+            if (!email) {
+                alert('Please enter your email address');
+                return;
+            }
+
+            auth.sendPasswordResetEmail(email)
+                .then(() => {
+                    alert('Password reset email sent! Check your inbox.');
+                    closeModal();
+                })
+                .catch((error) => {
+                    console.error('Password reset error:', error);
+                    alert('Error: ' + error.message);
+                });
         }
 
-        auth.sendPasswordResetEmail(email)
-            .then(() => {
-                alert('Password reset email sent!');
-            })
-            .catch((error) => {
-                alert('Error: ' + error.message);
-            });
-    }
+        function showResetPasswordModal() {
+            const email = document.getElementById('email').value;
+            const modal = document.createElement('div');
+            modal.innerHTML = `
+                <div class="modal-overlay">
+                    <div class="modal-content">
+                        <h2>Reset Password</h2>
+                        <input type="email" id="resetEmail" placeholder="Enter your email" value="${email || ''}">
+                        <button onclick="resetPassword()">Send Reset Link</button>
+                        <button onclick="closeModal()">Cancel</button>
+                    </div>
+                </div>
+            `;
+            document.body.appendChild(modal);
+        }
 
-    function loginWithGoogle() {
-        const provider = new firebase.auth.GoogleAuthProvider();
-        auth.signInWithPopup(provider)
-            .then((result) => {
-                window.location.href = 'dashboard.html';
-            })
-            .catch((error) => {
-                console.error('Google sign-in error:', error);
-                document.getElementById('errorMessage').textContent = 'Google sign-in failed';
-                document.getElementById('errorMessage').style.display = 'block';
-            });
-    }
-    
-    function loginWithFacebook() {
-        const provider = new firebase.auth.FacebookAuthProvider();
-        auth.signInWithPopup(provider)
-            .then((result) => {
-                window.location.href = 'dashboard.html';
-            })
-            .catch((error) => {
-                console.error('Facebook sign-in error:', error);
-                document.getElementById('errorMessage').textContent = 'Facebook sign-in failed';
-                document.getElementById('errorMessage').style.display = 'block';
-            });
-    }
-</script>
+        function loginWithGoogle() {
+            const provider = new firebase.auth.GoogleAuthProvider();
+            auth.signInWithPopup(provider)
+                .then((result) => {
+                    console.log('Google login successful:', result.user);
+                    window.location.href = 'dashboard.html';
+                })
+                .catch((error) => {
+                    console.error('Google sign-in error:', error);
+                    document.getElementById('errorMessage').textContent = 'Google sign-in failed';
+                    document.getElementById('errorMessage').style.display = 'block';
+                });
+        }
+        
+        function loginWithFacebook() {
+            const provider = new firebase.auth.FacebookAuthProvider();
+            auth.signInWithPopup(provider)
+                .then((result) => {
+                    console.log('Facebook login successful:', result.user);
+                    window.location.href = 'dashboard.html';
+                })
+                .catch((error) => {
+                    console.error('Facebook sign-in error:', error);
+                    document.getElementById('errorMessage').textContent = 'Facebook sign-in failed';
+                    document.getElementById('errorMessage').style.display = 'block';
+                });
+        }
+    </script>
 </body>
 </html>
-
-

@@ -42,7 +42,7 @@
                 </a>
             </nav>
             
-            <div class="nav-item" onclick="authFunctions.logout()">
+            <div class="nav-item" onclick="logout()">
                 <i class="fas fa-sign-out-alt"></i>
                 <span>Logout</span>
             </div>
@@ -146,48 +146,61 @@
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore-compat.js"></script>
     
     <!-- Firebase Configuration -->
-    <script src="js/firebase-config.js"></script>
-
-    <!-- After firebase-config.js -->
-    <script src="js/auth.js"></script>
+    <script src="firebase-config.js"></script>
     
     <!-- Auth Functions -->
     <script>
-        function logout() {
-            auth.signOut().then(() => {
+        // Initialize Firebase with proper checking
+        console.log('Initializing Firebase for dashboard...');
+        
+        // Use window object to avoid variable conflicts
+        if (!window.firebaseApp) {
+            window.firebaseApp = firebase.initializeApp(firebaseConfig);
+            console.log('New Firebase app initialized for dashboard');
+        } else {
+            console.log('Using existing Firebase app');
+        }
+        
+        // Initialize auth and db on window object
+        window.auth = firebase.auth();
+        window.db = firebase.firestore();
+
+        // Make logout function globally available
+        window.logout = function() {
+            window.auth.signOut().then(() => {
                 window.location.href = 'index.html';
             }).catch((error) => {
                 console.error('Logout error:', error);
             });
         }
 
-        // In dashboard.html, add this after auth functions
-        auth.onAuthStateChanged((user) => {
-        if (user) {
-            // User is signed in, get user data
-            db.collection('users').doc(user.uid).get()
-            .then((doc) => {
-        if (doc.exists) {
-          const userData = doc.data();
-          document.querySelector('.welcome-section h2').textContent = 
-            `Welcome back, ${userData.name || 'Student'}!`;
-        }
-      })
-      .catch((error) => {
-        console.log("Error getting user document:", error);
-      });
-    
-    // Get user's upcoming classes
-    getUpcomingClasses(user.uid);
-  } else {
-    window.location.href = 'index.html';
-  }
-});
+        // Auth state change listener
+        window.auth.onAuthStateChanged((user) => {
+            if (user) {
+                // User is signed in, get user data
+                window.db.collection('users').doc(user.uid).get()
+                .then((doc) => {
+                    if (doc.exists) {
+                        const userData = doc.data();
+                        document.querySelector('.welcome-section h2').textContent = 
+                            `Welcome back, ${userData.name || 'Student'}!`;
+                    }
+                })
+                .catch((error) => {
+                    console.log("Error getting user document:", error);
+                });
+        
+                // Get user's upcoming classes
+                getUpcomingClasses(user.uid);
+            } else {
+                window.location.href = 'index.html';
+            }
+        });
 
-function getUpcomingClasses(userId) {
-  // This would query your timetable data from Firestore
-  // Implementation depends on how you structure your data
-}
+        function getUpcomingClasses(userId) {
+            // This would query your timetable data from Firestore
+            console.log("Getting upcoming classes for user:", userId);
+        }
     </script>
 </body>
 </html>

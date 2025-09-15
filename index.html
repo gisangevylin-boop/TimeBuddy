@@ -279,6 +279,62 @@
             background: #e0e0e0;
             color: #333;
         }
+
+        /* Signup Modal Styles */
+        #signupModal .modal-content {
+            max-width: 450px;
+        }
+
+        .signup-form .input-group {
+            margin-bottom: 15px;
+        }
+
+        .signup-form label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 500;
+            color: #333;
+        }
+
+        .signup-form input {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 14px;
+            box-sizing: border-box;
+        }
+
+        .signup-form input:focus {
+            border-color: #7cb9e8;
+            outline: none;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .modal-header h2 {
+            margin: 0;
+            color: #4a90e2;
+        }
+
+        .close-btn {
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            color: #777;
+        }
+
+        .password-requirements {
+            font-size: 12px;
+            color: #666;
+            margin-top: 5px;
+        }
     </style>
 </head>
 
@@ -378,6 +434,70 @@
             </div>
         </div>
     </div>
+
+    <!-- Signup Modal -->
+    <div id="signupModal" class="modal-overlay">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Create New Account</h2>
+                <button class="close-btn" onclick="closeSignup()">&times;</button>
+            </div>
+            
+            <div class="error-message" id="signupErrorMessage"></div>
+            <div class="success-message" id="signupSuccessMessage"></div>
+            
+            <form class="signup-form" id="signupForm">
+                <div class="input-group">
+                    <label for="signupName">Full Name</label>
+                    <input type="text" id="signupName" placeholder="Enter your full name" required>
+                </div>
+                
+                <div class="input-group">
+                    <label for="signupEmail">Email</label>
+                    <input type="email" id="signupEmail" placeholder="Enter your email" required>
+                </div>
+                
+                <div class="input-group">
+                    <label for="signupPassword">Password</label>
+                    <input type="password" id="signupPassword" placeholder="Create a password" required>
+                    <div class="password-requirements">Must be at least 6 characters</div>
+                </div>
+                
+                <div class="input-group">
+                    <label for="signupConfirmPassword">Confirm Password</label>
+                    <input type="password" id="signupConfirmPassword" placeholder="Confirm your password" required>
+                </div>
+                
+                <button type="submit" class="login-btn">Create Account</button>
+            </form>
+            
+            <p style="text-align: center; margin-top: 15px;">
+                Already have an account? <a href="#" onclick="closeSignup();" style="color: #4a90e2;">Sign In</a>
+            </p>
+        </div>
+    </div>
+
+    <!-- Reset Password Modal -->
+    <div id="resetPasswordModal" class="modal-overlay">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Reset Password</h2>
+                <button class="close-btn" onclick="closeResetPasswordModal()">&times;</button>
+            </div>
+            
+            <div class="error-message" id="resetErrorMessage"></div>
+            <div class="success-message" id="resetSuccessMessage"></div>
+            
+            <p>Enter your email address and we'll send you a link to reset your password.</p>
+            
+            <div class="input-group">
+                <label for="resetEmail">Email</label>
+                <input type="email" id="resetEmail" placeholder="Enter your email" required>
+            </div>
+            
+            <button class="login-btn" onclick="resetPassword()">Send Reset Link</button>
+        </div>
+    </div>
     
     <!-- Load Firebase SDK FIRST -->
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
@@ -418,6 +538,15 @@
                 login();
             });
         }
+
+        // Add signup form submission handler
+        const signupForm = document.getElementById('signupForm');
+        if (signupForm) {
+            signupForm.addEventListener('submit', function(e) {
+                e.preventDefault();
+                register();
+            });
+        }
         
         // Check if user is already logged in
         window.auth.onAuthStateChanged((user) => {
@@ -427,6 +556,47 @@
             }
         });
     });
+
+     // Modal functions
+    function showSignup() {
+        console.log('Showing signup modal');
+        document.getElementById('signupModal').style.display = 'flex';
+    }
+
+    function closeSignup() {
+        document.getElementById('signupModal').style.display = 'none';
+        // Clear form fields
+        document.getElementById('signupForm').reset();
+        // Clear error messages
+        document.getElementById('signupErrorMessage').style.display = 'none';
+        document.getElementById('signupSuccessMessage').style.display = 'none';
+    }
+
+    function showResetPasswordModal() {
+        document.getElementById('resetPasswordModal').style.display = 'flex';
+    }
+
+    function closeResetPasswordModal() {
+        document.getElementById('resetPasswordModal').style.display = 'none';
+        // Clear form fields
+        document.getElementById('resetEmail').value = '';
+        // Clear error messages
+        document.getElementById('resetErrorMessage').style.display = 'none';
+        document.getElementById('resetSuccessMessage').style.display = 'none';
+    }
+
+    // Close modals when clicking outside
+    window.onclick = function(event) {
+        const signupModal = document.getElementById('signupModal');
+        const resetModal = document.getElementById('resetPasswordModal');
+        
+        if (event.target === signupModal) {
+            closeSignup();
+        }
+        if (event.target === resetModal) {
+            closeResetPasswordModal();
+        }
+    };
 
     // Update all auth references in your functions to use window.auth
     function login() {
@@ -477,10 +647,27 @@
         const password = document.getElementById('signupPassword').value;
         const confirmPassword = document.getElementById('signupConfirmPassword').value;
 
+        // Validate inputs
+        if (!name || !email || !password || !confirmPassword) {
+            errorMessage.textContent = 'Please fill in all fields';
+            errorMessage.style.display = 'block';
+            return;
+        }
+
         if (password !== confirmPassword) {
             alert("Passwords don't match");
+            errorMessage.style.display = 'block';
             return;
-        }   
+        }
+        
+        if (password.length < 6) {
+            errorMessage.textContent = "Password must be at least 6 characters";
+            errorMessage.style.display = 'block';
+            return;
+        }
+
+        // Clear any previous error messages
+        errorMessage.style.display = 'none';
 
         // Create user with email and password - use window.auth
         window.auth.createUserWithEmailAndPassword(email, password)
@@ -493,32 +680,56 @@
                 });
             })
             .then(() => {
-                alert('Account created successfully!');
-                closeModal();
+                successMessage.textContent = 'Account created successfully!';
+                successMessage.style.display = 'block';
+                
+                // Clear form
+                document.getElementById('signupForm').reset();
+                
+                // Redirect after a short delay
+                setTimeout(() => {
+                    window.location.href = 'dashboard.html';
+                }, 1500);
             })
             .catch((error) => {
                 console.error('Registration error:', error);
-                alert('Error: ' + error.message);
+                errorMessage.textContent = 'Error: ' + error.message;
+                errorMessage.style.display = 'block';
             });
     }
 
     function resetPassword() {
         const email = document.getElementById('resetEmail').value;
+        const errorMessage = document.getElementById('resetErrorMessage');
+        const successMessage = document.getElementById('resetSuccessMessage');
 
         if (!email) {
-            alert('Please enter your email address');
+            errorMessage.textContent = 'Please enter your email address';
+            errorMessage.style.display = 'block';
             return;
         }
+
+        // Clear previous messages
+        errorMessage.style.display = 'none';
 
         // Use window.auth
         window.auth.sendPasswordResetEmail(email)
             .then(() => {
-                alert('Password reset email sent! Check your inbox.');
-                closeModal();
+                successMessage.textContent = 'Password reset email sent! Check your inbox.';
+                successMessage.style.display = 'block';
+                
+                // Clear form
+                document.getElementById('resetEmail').value = '';
+                
+                // Close modal after a delay
+                setTimeout(() => {
+                    closeResetPasswordModal();
+                }, 3000);
             })
             .catch((error) => {
                 console.error('Password reset error:', error);
-                alert('Error: ' + error.message);
+                errorMessage.textContent = 'Error: ' + error.message;
+                errorMessage.style.display = 'block';
             });
     }
 

@@ -499,7 +499,7 @@
         </div>
     </div>
     
-    <!-- Firebase SDK -->
+<!-- Firebase SDK -->
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore-compat.js"></script>
@@ -510,344 +510,349 @@
     <!-- Auth Functions -->
     <script>
     // Initialize Firebase with proper checking
-console.log('Initializing Firebase...');
-
-// Use window object to avoid variable conflicts
-if (!window.firebaseApp) {
-    window.firebaseApp = firebase.initializeApp(firebaseConfig);
-    console.log('New Firebase app initialized');
-} else {
-    console.log('Using existing Firebase app');
-}
-
-// Initialize auth and db on window object
-window.auth = firebase.auth();
-window.db = firebase.firestore();
-
-console.log('Firebase initialized successfully');
-
-// Add event listeners when DOM is loaded
-document.addEventListener('DOMContentLoaded', function() {
-    console.log('DOM loaded');
+    console.log('Initializing Firebase...');
     
-    // Add form submission handler
-    const loginForm = document.getElementById('loginForm');
-    if (loginForm) {
-        loginForm.addEventListener('submit', function(e) {
-            e.preventDefault();
-            login();
-        });
-    }
-
-    // Add signup form submission handler
-    const signupForm = document.getElementById('signupForm');
-    if (signupForm) {
-        signupForm.addEventListener('submit', function(e) {
-            e.preventDefault();
-            register();
-        });
-    }
-    
-    // Check if user is already logged in
-    window.auth.onAuthStateChanged((user) => {
-        if (user) {
-            console.log('User already logged in:', user.email);
-            window.location.href = 'dashboard.html';
+    // Check if Firebase is already initialized
+    if (!window.firebaseApp) {
+        try {
+            window.firebaseApp = firebase.initializeApp(firebaseConfig);
+            console.log('New Firebase app initialized');
+        } catch (error) {
+            console.log('Firebase already initialized:', error);
+            window.firebaseApp = firebase.app();
         }
-    });
-});
-
-// Modal functions
-function showSignup() {
-    console.log('Showing signup modal');
-    document.getElementById('signupModal').style.display = 'flex';
-}
-
-function closeSignup() {
-    document.getElementById('signupModal').style.display = 'none';
-    // Clear form fields
-    document.getElementById('signupForm').reset();
-    // Clear error messages
-    document.getElementById('signupErrorMessage').style.display = 'none';
-    document.getElementById('signupSuccessMessage').style.display = 'none';
-}
-
-function showResetPasswordModal() {
-    document.getElementById('resetPasswordModal').style.display = 'flex';
-}
-
-function closeResetPasswordModal() {
-    document.getElementById('resetPasswordModal').style.display = 'none';
-    // Clear form fields
-    document.getElementById('resetEmail').value = '';
-    // Clear error messages
-    document.getElementById('resetErrorMessage').style.display = 'none';
-    document.getElementById('resetSuccessMessage').style.display = 'none';
-}
-
-// Close modals when clicking outside
-window.onclick = function(event) {
-    const signupModal = document.getElementById('signupModal');
-    const resetModal = document.getElementById('resetPasswordModal');
+    } else {
+        console.log('Using existing Firebase app');
+    }
     
-    if (event.target === signupModal) {
-        closeSignup();
-    }
-    if (event.target === resetModal) {
-        closeResetPasswordModal();
-    }
-};
-
-// Login function
-function login() {
-    console.log('Login function called');
-    const email = document.getElementById('email').value;
-    const password = document.getElementById('password').value;
-    const errorMessage = document.getElementById('errorMessage');
-    const loginButton = document.getElementById('loginButton');
-    const loginText = document.getElementById('loginText');
-    const loginLoader = document.getElementById('loginLoader');
-
-    if (!email || !password) {
-        errorMessage.textContent = 'Please enter both email and password';
-        errorMessage.style.display = 'block';
-        return;
-    }
-
-    // Show loading state
-    loginText.style.display = 'none';
-    loginLoader.style.display = 'block';
-    loginButton.disabled = true;
-
-    console.log('Attempting to login with:', email);
+    // Initialize auth and db on window object
+    window.auth = firebase.auth();
+    window.db = firebase.firestore();
     
-    // Sign in with email and password - use window.auth
-    window.auth.signInWithEmailAndPassword(email, password)
-        .then((userCredential) => {
-            console.log('Login successful:', userCredential.user);
-            
-            // Update last login time in Firestore
-            return window.db.collection('users').doc(userCredential.user.uid).update({
-                lastLogin: firebase.firestore.FieldValue.serverTimestamp()
+    console.log('Firebase initialized successfully');
+
+    // Add event listeners when DOM is loaded
+    document.addEventListener('DOMContentLoaded', function() {
+        console.log('DOM loaded');
+        
+        // Add form submission handler
+        const loginForm = document.getElementById('loginForm');
+        if (loginForm) {
+            loginForm.addEventListener('submit', function(e) {
+                e.preventDefault();
+                login();
             });
-        })
-        .then(() => {
-            // Redirect to dashboard on successful login
-            window.location.href = 'dashboard.html';
-        })
-        .catch((error) => {
-            console.error('Login error:', error);
-            errorMessage.textContent = 'Invalid email or password: ' + error.message;
-            errorMessage.style.display = 'block';
-            
-            // Reset button state
-            loginText.style.display = 'block';
-            loginLoader.style.display = 'none';
-            loginButton.disabled = false;
-        });
-}
+        }
 
-// FIXED register function - now properly saves to Firestore
-function register() {
-    const name = document.getElementById('signupName').value;
-    const email = document.getElementById('signupEmail').value;
-    const password = document.getElementById('signupPassword').value;
-    const confirmPassword = document.getElementById('signupConfirmPassword').value;
-
-    // Get the error and success message elements from the SIGNUP modal
-    const errorMessage = document.getElementById('signupErrorMessage');
-    const successMessage = document.getElementById('signupSuccessMessage');
-
-    // Validate inputs
-    if (!name || !email || !password || !confirmPassword) {
-        errorMessage.textContent = 'Please fill in all fields';
-        errorMessage.style.display = 'block';
-        return;
-    }
-
-    if (password !== confirmPassword) {
-        errorMessage.textContent = "Passwords don't match";
-        errorMessage.style.display = 'block';
-        return;
-    }
-
-    if (password.length < 6) {
-        errorMessage.textContent = "Password must be at least 6 characters";
-        errorMessage.style.display = 'block';
-        return;
-    }
-
-    // Clear any previous error messages
-    errorMessage.style.display = 'none';
-    successMessage.style.display = 'none';
-
-    // Show loading state
-    const signupButton = document.querySelector('#signupForm button');
-    const originalText = signupButton.textContent;
-    signupButton.innerHTML = '<div class="spinner" style="margin: 0 auto;"></div>';
-    signupButton.disabled = true;
-
-    console.log('Starting registration process for:', email);
-
-    // Create user with email and password - use window.auth
-    window.auth.createUserWithEmailAndPassword(email, password)
-        .then((userCredential) => {
-            console.log('User created in auth:', userCredential.user.uid);
-            
-            // Add user data to Firestore - use window.db
-            return window.db.collection('users').doc(userCredential.user.uid).set({
-                name: name,
-                email: email,
-                createdAt: firebase.firestore.FieldValue.serverTimestamp(),
-                lastLogin: firebase.firestore.FieldValue.serverTimestamp(),
-                uid: userCredential.user.uid
+        // Add signup form submission handler
+        const signupForm = document.getElementById('signupForm');
+        if (signupForm) {
+            signupForm.addEventListener('submit', function(e) {
+                e.preventDefault();
+                register();
             });
-        })
-        .then(() => {
-            console.log('User data saved to Firestore successfully');
-            successMessage.textContent = 'Account created successfully! Redirecting...';
-            successMessage.style.display = 'block';
-            
-            // Clear form
-            document.getElementById('signupForm').reset();
-            
-            // Redirect after a short delay
-            setTimeout(() => {
+        }
+        
+        // Check if user is already logged in
+        window.auth.onAuthStateChanged((user) => {
+            if (user) {
+                console.log('User already logged in:', user.email);
                 window.location.href = 'dashboard.html';
-            }, 2000);
-        })
-        .catch((error) => {
-            console.error('Registration error:', error);
-            
-            // More specific error messages
-            if (error.code === 'auth/email-already-in-use') {
-                errorMessage.textContent = 'This email is already registered. Please use a different email or sign in.';
-            } else if (error.code === 'auth/weak-password') {
-                errorMessage.textContent = 'Password is too weak. Please use a stronger password.';
-            } else if (error.code === 'auth/invalid-email') {
-                errorMessage.textContent = 'Invalid email address. Please check your email format.';
-            } else if (error.code === 'permission-denied') {
-                errorMessage.textContent = 'Permission denied. Please check your Firestore security rules.';
-            } else {
-                errorMessage.textContent = 'Error: ' + error.message;
             }
-            
-            errorMessage.style.display = 'block';
-            
-            // Reset button state
-            signupButton.textContent = originalText;
-            signupButton.disabled = false;
         });
-}
+    });
 
-function resetPassword() {
-    const email = document.getElementById('resetEmail').value;
-    const errorMessage = document.getElementById('resetErrorMessage');
-    const successMessage = document.getElementById('resetSuccessMessage');
-
-    if (!email) {
-        errorMessage.textContent = 'Please enter your email address';
-        errorMessage.style.display = 'block';
-        return;
+    // Modal functions
+    function showSignup() {
+        console.log('Showing signup modal');
+        document.getElementById('signupModal').style.display = 'flex';
     }
 
-    // Clear previous messages
-    errorMessage.style.display = 'none';
+    function closeSignup() {
+        document.getElementById('signupModal').style.display = 'none';
+        // Clear form fields
+        document.getElementById('signupForm').reset();
+        // Clear error messages
+        document.getElementById('signupErrorMessage').style.display = 'none';
+        document.getElementById('signupSuccessMessage').style.display = 'none';
+    }
 
-    // Use window.auth
-    window.auth.sendPasswordResetEmail(email)
-        .then(() => {
-            successMessage.textContent = 'Password reset email sent! Check your inbox.';
-            successMessage.style.display = 'block';
-            
-            // Clear form
-            document.getElementById('resetEmail').value = '';
-            
-            // Close modal after a delay
-            setTimeout(() => {
-                closeResetPasswordModal();
-            }, 3000);
-        })
-        .catch((error) => {
-            console.error('Password reset error:', error);
-            errorMessage.textContent = 'Error: ' + error.message;
+    function showResetPasswordModal() {
+        document.getElementById('resetPasswordModal').style.display = 'flex';
+    }
+
+    function closeResetPasswordModal() {
+        document.getElementById('resetPasswordModal').style.display = 'none';
+        // Clear form fields
+        document.getElementById('resetEmail').value = '';
+        // Clear error messages
+        document.getElementById('resetErrorMessage').style.display = 'none';
+        document.getElementById('resetSuccessMessage').style.display = 'none';
+    }
+
+    // Close modals when clicking outside
+    window.onclick = function(event) {
+        const signupModal = document.getElementById('signupModal');
+        const resetModal = document.getElementById('resetPasswordModal');
+        
+        if (event.target === signupModal) {
+            closeSignup();
+        }
+        if (event.target === resetModal) {
+            closeResetPasswordModal();
+        }
+    };
+
+    // Login function
+    function login() {
+        console.log('Login function called');
+        const email = document.getElementById('email').value;
+        const password = document.getElementById('password').value;
+        const errorMessage = document.getElementById('errorMessage');
+        const loginButton = document.getElementById('loginButton');
+        const loginText = document.getElementById('loginText');
+        const loginLoader = document.getElementById('loginLoader');
+
+        if (!email || !password) {
+            errorMessage.textContent = 'Please enter both email and password';
             errorMessage.style.display = 'block';
-        });
-}
+            return;
+        }
 
-function loginWithGoogle() {
-    const provider = new firebase.auth.GoogleAuthProvider();
-    // Use window.auth
-    window.auth.signInWithPopup(provider)
-        .then((result) => {
-            console.log('Google login successful:', result.user);
-            
-            // Check if user already exists in Firestore
-            return window.db.collection('users').doc(result.user.uid).get();
-        })
-        .then((doc) => {
-            if (!doc.exists) {
-                // User doesn't exist, create a new record
-                return window.db.collection('users').doc(result.user.uid).set({
-                    name: result.user.displayName,
-                    email: result.user.email,
-                    createdAt: firebase.firestore.FieldValue.serverTimestamp(),
-                    lastLogin: firebase.firestore.FieldValue.serverTimestamp(),
-                    uid: result.user.uid
-                });
-            } else {
-                // User exists, update last login
-                return window.db.collection('users').doc(result.user.uid).update({
+        // Show loading state
+        loginText.style.display = 'none';
+        loginLoader.style.display = 'block';
+        loginButton.disabled = true;
+
+        console.log('Attempting to login with:', email);
+        
+        // Sign in with email and password - use window.auth
+        window.auth.signInWithEmailAndPassword(email, password)
+            .then((userCredential) => {
+                console.log('Login successful:', userCredential.user);
+                
+                // Update last login time in Firestore
+                return window.db.collection('users').doc(userCredential.user.uid).update({
                     lastLogin: firebase.firestore.FieldValue.serverTimestamp()
                 });
-            }
-        })
-        .then(() => {
-            window.location.href = 'dashboard.html';
-        })
-        .catch((error) => {
-            console.error('Google sign-in error:', error);
-            document.getElementById('errorMessage').textContent = 'Google sign-in failed';
-            document.getElementById('errorMessage').style.display = 'block';
-        });
-}
+            })
+            .then(() => {
+                // Redirect to dashboard on successful login
+                window.location.href = 'dashboard.html';
+            })
+            .catch((error) => {
+                console.error('Login error:', error);
+                errorMessage.textContent = 'Invalid email or password: ' + error.message;
+                errorMessage.style.display = 'block';
+                
+                // Reset button state
+                loginText.style.display = 'block';
+                loginLoader.style.display = 'none';
+                loginButton.disabled = false;
+            });
+    }
 
-function loginWithFacebook() {
-    const provider = new firebase.auth.FacebookAuthProvider();
-    // Use window.auth
-    window.auth.signInWithPopup(provider)
-        .then((result) => {
-            console.log('Facebook login successful:', result.user);
-            
-            // Check if user already exists in Firestore
-            return window.db.collection('users').doc(result.user.uid).get();
-        })
-        .then((doc) => {
-            if (!doc.exists) {
-                // User doesn't exist, create a new record
-                return window.db.collection('users').doc(result.user.uid).set({
-                    name: result.user.displayName,
-                    email: result.user.email,
+    // FIXED register function - now properly saves to Firestore
+    function register() {
+        const name = document.getElementById('signupName').value;
+        const email = document.getElementById('signupEmail').value;
+        const password = document.getElementById('signupPassword').value;
+        const confirmPassword = document.getElementById('signupConfirmPassword').value;
+    
+        // Get the error and success message elements from the SIGNUP modal
+        const errorMessage = document.getElementById('signupErrorMessage');
+        const successMessage = document.getElementById('signupSuccessMessage');
+
+        // Validate inputs
+        if (!name || !email || !password || !confirmPassword) {
+            errorMessage.textContent = 'Please fill in all fields';
+            errorMessage.style.display = 'block';
+            return;
+        }
+
+        if (password !== confirmPassword) {
+            errorMessage.textContent = "Passwords don't match";
+            errorMessage.style.display = 'block';
+            return;
+        }
+    
+        if (password.length < 6) {
+            errorMessage.textContent = "Password must be at least 6 characters";
+            errorMessage.style.display = 'block';
+            return;
+        }
+
+        // Clear any previous error messages
+        errorMessage.style.display = 'none';
+        successMessage.style.display = 'none';
+
+        // Show loading state
+        const signupButton = document.querySelector('#signupForm button');
+        const originalText = signupButton.textContent;
+        signupButton.innerHTML = '<div class="spinner" style="margin: 0 auto;"></div>';
+        signupButton.disabled = true;
+
+        console.log('Starting registration process for:', email);
+
+        // Create user with email and password - use window.auth
+        window.auth.createUserWithEmailAndPassword(email, password)
+            .then((userCredential) => {
+                console.log('User created in auth:', userCredential.user.uid);
+                
+                // Add user data to Firestore - use window.db
+                return window.db.collection('users').doc(userCredential.user.uid).set({
+                    name: name,
+                    email: email,
                     createdAt: firebase.firestore.FieldValue.serverTimestamp(),
                     lastLogin: firebase.firestore.FieldValue.serverTimestamp(),
-                    uid: result.user.uid
+                    uid: userCredential.user.uid
                 });
-            } else {
-                // User exists, update last login
-                return window.db.collection('users').doc(result.user.uid).update({
-                    lastLogin: firebase.firestore.FieldValue.serverTimestamp()
-                });
-            }
-        })
-        .then(() => {
-            window.location.href = 'dashboard.html';
-        })
-        .catch((error) => {
-            console.error('Facebook sign-in error:', error);
-            document.getElementById('errorMessage').textContent = 'Facebook sign-in failed';
-            document.getElementById('errorMessage').style.display = 'block';
-        });
-}
+            })
+            .then(() => {
+                console.log('User data saved to Firestore successfully');
+                successMessage.textContent = 'Account created successfully! Redirecting...';
+                successMessage.style.display = 'block';
+                
+                // Clear form
+                document.getElementById('signupForm').reset();
+                
+                // Redirect after a short delay
+                setTimeout(() => {
+                    window.location.href = 'dashboard.html';
+                }, 2000);
+            })
+            .catch((error) => {
+                console.error('Registration error:', error);
+                
+                // More specific error messages
+                if (error.code === 'auth/email-already-in-use') {
+                    errorMessage.textContent = 'This email is already registered. Please use a different email or sign in.';
+                } else if (error.code === 'auth/weak-password') {
+                    errorMessage.textContent = 'Password is too weak. Please use a stronger password.';
+                } else if (error.code === 'auth/invalid-email') {
+                    errorMessage.textContent = 'Invalid email address. Please check your email format.';
+                } else if (error.code === 'permission-denied') {
+                    errorMessage.textContent = 'Permission denied. Please check your Firestore security rules.';
+                } else {
+                    errorMessage.textContent = 'Error: ' + error.message;
+                }
+                
+                errorMessage.style.display = 'block';
+                
+                // Reset button state
+                signupButton.textContent = originalText;
+                signupButton.disabled = false;
+            });
+    }
+
+    function resetPassword() {
+        const email = document.getElementById('resetEmail').value;
+        const errorMessage = document.getElementById('resetErrorMessage');
+        const successMessage = document.getElementById('resetSuccessMessage');
+
+        if (!email) {
+            errorMessage.textContent = 'Please enter your email address';
+            errorMessage.style.display = 'block';
+            return;
+        }
+
+        // Clear previous messages
+        errorMessage.style.display = 'none';
+
+        // Use window.auth
+        window.auth.sendPasswordResetEmail(email)
+            .then(() => {
+                successMessage.textContent = 'Password reset email sent! Check your inbox.';
+                successMessage.style.display = 'block';
+                
+                // Clear form
+                document.getElementById('resetEmail').value = '';
+                
+                // Close modal after a delay
+                setTimeout(() => {
+                    closeResetPasswordModal();
+                }, 3000);
+            })
+            .catch((error) => {
+                console.error('Password reset error:', error);
+                errorMessage.textContent = 'Error: ' + error.message;
+                errorMessage.style.display = 'block';
+            });
+    }
+
+    function loginWithGoogle() {
+        const provider = new firebase.auth.GoogleAuthProvider();
+        // Use window.auth
+        window.auth.signInWithPopup(provider)
+            .then((result) => {
+                console.log('Google login successful:', result.user);
+                
+                // Check if user already exists in Firestore
+                return window.db.collection('users').doc(result.user.uid).get();
+            })
+            .then((doc) => {
+                if (!doc.exists) {
+                    // User doesn't exist, create a new record
+                    return window.db.collection('users').doc(result.user.uid).set({
+                        name: result.user.displayName,
+                        email: result.user.email,
+                        createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+                        lastLogin: firebase.firestore.FieldValue.serverTimestamp(),
+                        uid: result.user.uid
+                    });
+                } else {
+                    // User exists, update last login
+                    return window.db.collection('users').doc(result.user.uid).update({
+                        lastLogin: firebase.firestore.FieldValue.serverTimestamp()
+                    });
+                }
+            })
+            .then(() => {
+                window.location.href = 'dashboard.html';
+            })
+            .catch((error) => {
+                console.error('Google sign-in error:', error);
+                document.getElementById('errorMessage').textContent = 'Google sign-in failed';
+                document.getElementById('errorMessage').style.display = 'block';
+            });
+    }
+    
+    function loginWithFacebook() {
+        const provider = new firebase.auth.FacebookAuthProvider();
+        // Use window.auth
+        window.auth.signInWithPopup(provider)
+            .then((result) => {
+                console.log('Facebook login successful:', result.user);
+                
+                // Check if user already exists in Firestore
+                return window.db.collection('users').doc(result.user.uid).get();
+            })
+            .then((doc) => {
+                if (!doc.exists) {
+                    // User doesn't exist, create a new record
+                    return window.db.collection('users').doc(result.user.uid).set({
+                        name: result.user.displayName,
+                        email: result.user.email,
+                        createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+                        lastLogin: firebase.firestore.FieldValue.serverTimestamp(),
+                        uid: result.user.uid
+                    });
+                } else {
+                    // User exists, update last login
+                    return window.db.collection('users').doc(result.user.uid).update({
+                        lastLogin: firebase.firestore.FieldValue.serverTimestamp()
+                    });
+                }
+            })
+            .then(() => {
+                window.location.href = 'dashboard.html';
+            })
+            .catch((error) => {
+                console.error('Facebook sign-in error:', error);
+                document.getElementById('errorMessage').textContent = 'Facebook sign-in failed';
+                document.getElementById('errorMessage').style.display = 'block';
+            });
+    }
 </script>
 </body>
 </html>

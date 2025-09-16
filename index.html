@@ -641,63 +641,67 @@
     }
 
     // Update all other functions to use window.auth and window.db
-    function register() {
-        const name = document.getElementById('signupName').value;
-        const email = document.getElementById('signupEmail').value;
-        const password = document.getElementById('signupPassword').value;
-        const confirmPassword = document.getElementById('signupConfirmPassword').value;
+ function register() {
+    const name = document.getElementById('signupName').value;
+    const email = document.getElementById('signupEmail').value;
+    const password = document.getElementById('signupPassword').value;
+    const confirmPassword = document.getElementById('signupConfirmPassword').value;
+    
+    // Get the error and success message elements from the SIGNUP modal
+    const errorMessage = document.getElementById('signupErrorMessage');
+    const successMessage = document.getElementById('signupSuccessMessage');
 
-        // Validate inputs
-        if (!name || !email || !password || !confirmPassword) {
-            errorMessage.textContent = 'Please fill in all fields';
-            errorMessage.style.display = 'block';
-            return;
-        }
-
-        if (password !== confirmPassword) {
-            alert("Passwords don't match");
-            errorMessage.style.display = 'block';
-            return;
-        }
-        
-        if (password.length < 6) {
-            errorMessage.textContent = "Password must be at least 6 characters";
-            errorMessage.style.display = 'block';
-            return;
-        }
-
-        // Clear any previous error messages
-        errorMessage.style.display = 'none';
-
-        // Create user with email and password - use window.auth
-        window.auth.createUserWithEmailAndPassword(email, password)
-            .then((userCredential) => {
-                // Add user data to Firestore - use window.db
-                return window.db.collection('users').doc(userCredential.user.uid).set({
-                    name: name,
-                    email: email,
-                    createdAt: firebase.firestore.FieldValue.serverTimestamp()
-                });
-            })
-            .then(() => {
-                successMessage.textContent = 'Account created successfully!';
-                successMessage.style.display = 'block';
-                
-                // Clear form
-                document.getElementById('signupForm').reset();
-                
-                // Redirect after a short delay
-                setTimeout(() => {
-                    window.location.href = 'dashboard.html';
-                }, 1500);
-            })
-            .catch((error) => {
-                console.error('Registration error:', error);
-                errorMessage.textContent = 'Error: ' + error.message;
-                errorMessage.style.display = 'block';
-            });
+    // Validate inputs
+    if (!name || !email || !password || !confirmPassword) {
+        errorMessage.textContent = 'Please fill in all fields';
+        errorMessage.style.display = 'block';
+        return;
     }
 
+    if (password !== confirmPassword) {
+        errorMessage.textContent = "Passwords don't match";
+        errorMessage.style.display = 'block';
+        return;
+    }
+    
+    if (password.length < 6) {
+        errorMessage.textContent = "Password must be at least 6 characters";
+        errorMessage.style.display = 'block';
+        return;
+    }
+
+    // Clear any previous error messages
+    errorMessage.style.display = 'none';
+
+    // Create user with email and password - use window.auth
+    window.auth.createUserWithEmailAndPassword(email, password)
+        .then((userCredential) => {
+            // Add user data to Firestore - use window.db
+            return window.db.collection('users').doc(userCredential.user.uid).set({
+                name: name,
+                email: email,
+                createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+                lastLogin: firebase.firestore.FieldValue.serverTimestamp()
+            });
+        })
+        .then(() => {
+            successMessage.textContent = 'Account created successfully!';
+            successMessage.style.display = 'block';
+            
+            // Clear form
+            document.getElementById('signupForm').reset();
+            
+            // Redirect after a short delay
+            setTimeout(() => {
+                window.location.href = 'dashboard.html';
+            }, 1500);
+        })
+        .catch((error) => {
+            console.error('Registration error:', error);
+            errorMessage.textContent = 'Error: ' + error.message;
+            errorMessage.style.display = 'block';
+        });
+}
     function resetPassword() {
         const email = document.getElementById('resetEmail').value;
         const errorMessage = document.getElementById('resetErrorMessage');

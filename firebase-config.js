@@ -9,15 +9,16 @@ const firebaseConfig = {
   measurementId: "G-KF4YRMJ6YE"
 };
 
+// Export the config for use in other files
+window.firebaseConfig = firebaseConfig;
+
 // Initialize Firebase
-firebase.initializeApp(firebaseConfig);
+const app = firebase.initializeApp(firebaseConfig);
 
 // Initialize services
-const app = firebase.initializeApp(firebaseConfig);
 const auth = firebase.auth();
 const db = firebase.firestore();
 
 // Make them globally available
 window.auth = auth;
-
 window.db = db;

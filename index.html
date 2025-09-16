@@ -653,7 +653,7 @@
         const email = document.getElementById('signupEmail').value;
         const password = document.getElementById('signupPassword').value;
         const confirmPassword = document.getElementById('signupConfirmPassword').value;
-        
+    
         // Get the error and success message elements from the SIGNUP modal
         const errorMessage = document.getElementById('signupErrorMessage');
         const successMessage = document.getElementById('signupSuccessMessage');
@@ -670,7 +670,7 @@
             errorMessage.style.display = 'block';
             return;
         }
-        
+    
         if (password.length < 6) {
             errorMessage.textContent = "Password must be at least 6 characters";
             errorMessage.style.display = 'block';
@@ -686,6 +686,8 @@
         const originalText = signupButton.textContent;
         signupButton.innerHTML = '<div class="spinner" style="margin: 0 auto;"></div>';
         signupButton.disabled = true;
+
+        console.log('Starting registration process for:', email);
 
         // Create user with email and password - use window.auth
         window.auth.createUserWithEmailAndPassword(email, password)
@@ -716,14 +718,31 @@
             })
             .catch((error) => {
                 console.error('Registration error:', error);
-                errorMessage.textContent = 'Error: ' + error.message;
-                errorMessage.style.display = 'block';
                 
                 // Reset button state
                 signupButton.textContent = originalText;
                 signupButton.disabled = false;
             });
     }
+
+    // More specific error messages
+            if (error.code === 'auth/email-already-in-use') {
+                errorMessage.textContent = 'This email is already registered. Please use a different email or sign in.';
+            } else if (error.code === 'auth/weak-password') {
+                errorMessage.textContent = 'Password is too weak. Please use a stronger password.';
+            } else if (error.code === 'auth/invalid-email') {
+                errorMessage.textContent = 'Invalid email address. Please check your email format.';
+            } else if (error.code === 'permission-denied') {
+                errorMessage.textContent = 'Permission denied. Please check your Firestore security rules.';
+            } else {
+                errorMessage.textContent = 'Error: ' + error.message;
+            }
+            
+            errorMessage.style.display = 'block';
+            
+            // Reset button state
+            signupButton.textContent = originalText;
+            signupButton.disabled = false;
 
     function resetPassword() {
         const email = document.getElementById('resetEmail').value;
